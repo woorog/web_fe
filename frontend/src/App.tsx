@@ -12,7 +12,7 @@ const App = () => {
         <Route path="/" element={<Home />} />
         {!isLoggedIn && <Route path="/signup" element={<Sign />} />}
         {!isLoggedIn && <Route path="/signin" element={<Sign />} />}
-        <Route path="/problems" element={<ProblemList />} />
+        <Route path="/problems" element={<ProblemList/>} />
         {isLoggedIn ? (
           <Route path="/problem/:version/:id" element={<Problem />} />
         ) : (

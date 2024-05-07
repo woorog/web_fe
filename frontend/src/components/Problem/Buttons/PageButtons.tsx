@@ -64,8 +64,10 @@ const PageButtons = () => {
     toggle();
   }, [isShowing, toggle]);
 
-  const buttonNames = ['문제', '질문', '테스트케이스'];
-  const callbackList = [setProblem, setQuestion, setTestcase];
+  // const buttonNames = ['문제', '질문', '테스트케이스'];
+  // const callbackList = [setProblem, setQuestion, setTestcase];
+  const buttonNames = ['문제'];
+  const callbackList = [setProblem];
   if (version === 'multi') {
     buttonNames.push('초대');
     callbackList.push(invite);

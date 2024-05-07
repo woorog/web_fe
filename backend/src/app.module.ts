@@ -37,7 +37,7 @@ import * as process from 'process';
         database: configService.get('database.database'),
         entities: [User, TestCase, Solved, Problem],
         dropSchema: false,
-        synchronize: false,
+        synchronize: true,
         logging: false,
       }),
     }),

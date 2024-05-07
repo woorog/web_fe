@@ -1,25 +1,26 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+
+import * as process from 'process';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
-import { ProblemModule } from './problem/problem.module';
-import { typeormConfig } from './config/typeorm.config';
-import { TestCaseModule } from './test-case/test-case.module';
-import { SolvedModule } from './solved/solved.module';
-import { AuthModule } from './auth/auth.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { User } from './users/entities/user.entity';
-import { TestCase } from './test-case/entities/test-case.entity';
-import { Solved } from './solved/entities/solved.entity';
+import { ProblemModule } from './problem/problem.module';
 import { Problem } from './problem/entities/problem.entity';
-import { RankModule } from './rank/rank.module';
-import * as process from 'process';
+import { SolvedModule } from './solved/solved.module';
+import { Solved } from './solved/entities/solved.entity';
+import { TestCase } from './test-case/entities/test-case.entity';
+import { TestCaseModule } from './test-case/test-case.module';
+import { AuthModule } from './auth/auth.module';
+import { typeormConfig } from './config/typeorm.config';
+
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      // configuration 설정을 coifg module 불러 올 때 로드한다
       isGlobal: true,
       load: [typeormConfig],
       envFilePath:
@@ -38,16 +39,14 @@ import * as process from 'process';
         entities: [User, TestCase, Solved, Problem],
         dropSchema: false,
         synchronize: true,
-        logging: false,
+        logging: true,
       }),
     }),
-
     UsersModule,
     ProblemModule,
     TestCaseModule,
     SolvedModule,
     AuthModule,
-    RankModule,
   ],
   controllers: [AppController],
   providers: [AppService],

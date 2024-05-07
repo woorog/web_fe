@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { CreateProblemDto } from './dto/create-problem.dto';
-import { UpdateProblemDto } from './dto/update-problem.dto';
+import { CreateProblemDto } from './dto/createProblem.dto';
+import { UpdateProblemDto } from './dto/updateProblem.dto';
 import { Problem } from './entities/problem.entity';
-import { SimpleProblemDto } from './dto/simple-problem.dto';
+import { SimpleProblemDto } from './dto/simpleProblem.dto';
 import { IFindProblemOptions } from './dto/findAllWithPaging.interface';
 import { isFalsy } from '../utils/boolUtils';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -33,7 +33,6 @@ export class ProblemService {
     return new SimpleProblemDto(savedProblem);
   }
 
-  // TODO: 쿼리를 한 번만 보내서 찾는 방법에 대한 고민이 필요하다.
   async findAllProblems({
     loginId,
     isRandom,

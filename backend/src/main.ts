@@ -7,9 +7,7 @@ async function bootstrap() {
   app.enableCors();
   app.setGlobalPrefix('api');
   const swaggerDocumentBuilder = new DocumentBuilder()
-    .setTitle('CamperRank APIs')
-    .setDescription('CamperRank API 관련 문서입니다.')
-    .setVersion('1.0')
+    .setTitle('Online Core Time API')
     .build();
   const swaggerDocument = SwaggerModule.createDocument(
     app,

@@ -62,12 +62,6 @@ const PageButtonsWrapper = styled.div`
   padding-top: 3rem;
 `;
 
-const Spacer = styled.div`
-  width: 10px; // 기본 너비
-  cursor: col-resize; // 커서 스타일 변경
-  background: #ccc; // 스페이서의 배경색
-`;
-
 const ProblemWrapper = styled.div`
   display: flex;
   flex-direction: row; // Align children side by side
@@ -75,6 +69,7 @@ const ProblemWrapper = styled.div`
   padding: 1rem;
   overflow-x: hidden; // Handle overflowing content
   overflow-y: auto; // Allow vertical scrolling
+
   ::-webkit-scrollbar {
     width: 20px;
   }
@@ -136,8 +131,7 @@ const SolvingWrapper = styled.div`
 
 const VideoContainer = styled.div`
   width: 30%; // Allocate 30% width for the video
-  height: 100%; // Match the height of the ProblemWrapper
-  background-color: #f0f0f0; // Optional background color for distinction
+  height: 85%; // Match the height of the ProblemWrapper
 `;
 
 const ContentContainer = styled.div`
@@ -238,32 +232,6 @@ const Problem = () => {
   const [defaultCode, setDefaultCode] = useState({ ...defaultCodes });
   const problemRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
-
-  const [videoWidth, setVideoWidth] = useState(30); // VideoContainer의 초기 너비 퍼센트
-  const [isResizing, setIsResizing] = useState(false); // 리사이징 상태 관리
-
-  const handleMouseMove = (e: { clientX: number; }) => {
-    if (!isResizing || !problemRef.current) return; // 추가적인 null 체크
-    const newWidth = e.clientX - problemRef.current.getBoundingClientRect().left;
-    const percentageWidth = (newWidth / problemRef.current.clientWidth) * 100;
-    if (percentageWidth > 10 && percentageWidth < 90) {
-      console.log('Resizing to: ', percentageWidth);
-      setVideoWidth(percentageWidth); // 상태 업데이트
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsResizing(false);
-    document.removeEventListener('mousemove', handleMouseMove);
-    document.removeEventListener('mouseup', handleMouseUp);
-  };
-
-  const handleMouseDown = (e: { preventDefault: () => void }) => {
-    e.preventDefault();
-    setIsResizing(true);
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-  };
 
   const ydoc = useMemo(() => new Y.Doc(), []);
   const [provider, ytext] = useMemo(() => {
@@ -577,12 +545,12 @@ const Problem = () => {
         </PageButtonsWrapper>
         <ProblemWrapper ref={problemRef}>
           {version === 'multi' && (
-            <VideoContainer style={{ width: `${videoWidth}%` }}>
+            <VideoContainer>
               <Video />
             </VideoContainer>
           )}
-          <Spacer onMouseDown={handleMouseDown} />
-          <ContentContainer style={{ width: `${100 - videoWidth}%` }}>
+          {/*여기부분에  <ContentContainer>  <VideoContainer>  둘 사이의 간격을 조절할수있게 만들어줘 */}
+          <ContentContainer>
             {problem && <ProblemContent problem={problem} />}
           </ContentContainer>
         </ProblemWrapper>

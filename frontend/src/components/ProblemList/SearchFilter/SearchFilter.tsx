@@ -123,8 +123,7 @@ import { useRecoilState } from 'recoil';
 import { filterState } from '../../../recoils';
 
 const FiltersContainer = styled.div`
-  width: 100%;
-  height: 13rem;
+  height: 0.1rem;
   position: relative;
   background: #e5ebdf;
   display: flex;

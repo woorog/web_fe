@@ -32,6 +32,7 @@ const UserVideoContainer = styled.video`
   max-height: 9rem;
   height: auto; // Maintain aspect ratio
   margin-bottom: 1rem; // Space between videos
+  background-color: #FFFFFF; // 배경을 흰색으로 설정
 `;
 
 const DivWrapper = styled.div`

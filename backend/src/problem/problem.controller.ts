@@ -1,26 +1,12 @@
-import {
-  Body,
-  Controller,
-  DefaultValuePipe,
-  Delete,
-  Get,
-  Header,
-  HttpCode,
-  HttpException,
-  HttpStatus,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-  Query,
-  UsePipes,
-  ValidationPipe,
+import { Body, Controller, DefaultValuePipe, Delete, Get, Header, HttpCode, HttpException, HttpStatus,
+  Param,ParseIntPipe,Patch, Post, Query, UsePipes, ValidationPipe,
 } from '@nestjs/common';
-import { ProblemService } from './problem.service';
-import { CreateProblemDto } from './dto/create-problem.dto';
-import { UpdateProblemDto } from './dto/update-problem.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { SimpleProblemDto } from './dto/simple-problem.dto';
+
+import { ProblemService } from './problem.service';
+import { CreateProblemDto } from './dto/createProblem.dto';
+import { UpdateProblemDto } from './dto/updateProblem.dto';
+import { SimpleProblemDto } from './dto/simpleProblem.dto';
 
 @Controller('problem')
 @ApiTags('문제 API')

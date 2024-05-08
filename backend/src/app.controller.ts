@@ -1,14 +1,15 @@
 import { Controller, Get, HttpStatus } from '@nestjs/common';
+
 import { AppService } from './app.service';
-import { TestCaseService } from './test-case/test-case.service';
 import { UsersService } from './users/users.service';
-import { ProblemService } from './problem/problem.service';
-import { SolvedService } from './solved/solved.service';
 import { CreateUserDto } from './users/dto/create-user.dto';
-import { CreateProblemDto } from './problem/dto/create-problem.dto';
-import { CreateTestCaseDto } from './test-case/dto/create-test-case.dto';
 import { CreateSolvedDto } from './solved/dto/create-solved.dto';
+import { SolvedService } from './solved/solved.service';
 import { ProgrammingLanguage } from './solved/entities/ProgrammingLanguage.enum';
+import { ProblemService } from './problem/problem.service';
+import { CreateProblemDto } from './problem/dto/createProblem.dto';
+import { CreateTestCaseDto } from './test-case/dto/create-test-case.dto';
+import { TestCaseService } from './test-case/test-case.service';
 
 @Controller()
 export class AppController {

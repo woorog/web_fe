@@ -129,7 +129,7 @@ export const SignupInputForm = () => {
       <AnchorLogo to={'/'}>
         Signup for
         <br />
-        Camper<GreenMark>Rank</GreenMark>
+        On<GreenMark>Core</GreenMark>
       </AnchorLogo>
       <InputFormContainer>
         <IDInputContainer>

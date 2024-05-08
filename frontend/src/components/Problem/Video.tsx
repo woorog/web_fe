@@ -6,35 +6,68 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { socketState } from '../../recoils';
 
+// const VideoContainer = styled.div`
+//   margin-top: 1rem;
+//   width: 100%;
+//   height: 9rem;
+//   display: flex;
+//   justify-content: right;
+//   align-items: center;
+// `;
+
 const VideoContainer = styled.div`
   margin-top: 1rem;
   width: 100%;
-  height: 9rem;
+  min-height: 9rem; // Minimum height for at least one video
   display: flex;
-  justify-content: right;
-  align-items: center;
+  flex-direction: column; // Stack children vertically
+  justify-content: flex-start; // Align children to the top of the container
+  align-items: center; // Center align horizontally
+  overflow: auto; // Allows scrolling when content exceeds the container's height
 `;
 
 const UserVideoContainer = styled.video`
   max-width: 16rem;
-  width: 33%;
+  width: 100%; // Takes full width of the container
   max-height: 9rem;
-  height: auto;
-  margin-right: 2px;
+  height: auto; // Maintain aspect ratio
+  margin-bottom: 1rem; // Space between videos
 `;
 
 const DivWrapper = styled.div`
   position: relative;
   max-height: 9rem;
-  max-width: 16rem;
-  width: 33%;
+  width: 100%; // Ensure this matches the parent container width
   height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center; // Center align the video in this div
 
   video {
     width: 100%;
-    margin-right: 0;
   }
 `;
+
+// const UserVideoContainer = styled.video`
+//   max-width: 16rem;
+//   width: 33%;
+//   max-height: 9rem;
+//   height: auto;
+//   margin-right: 2px;
+// `;
+//
+// const DivWrapper = styled.div`
+//   position: relative;
+//   max-height: 9rem;
+//   max-width: 16rem;
+//   width: 33%;
+//   height: auto;
+//
+//   video {
+//     width: 100%;
+//     margin-right: 0;
+//   }
+// `;
 
 const ButtonContainer = styled.div`
   position: absolute;
@@ -298,29 +331,29 @@ export const Video = () => {
   return (
     <VideoContainer>
       {Object.entries(peers).map((user, idx) => (
-        <UserVideoContainer
-          autoPlay
-          playsInline
-          ref={(ele) => {
-            if (ele) {
-              peerVideosRef.current[idx] = ele;
-            }
-          }}
-          key={idx}
-        />
-      ))}
-      <DivWrapper>
-        <UserVideoContainer ref={videoRef} autoPlay muted playsInline />
-        <ButtonContainer>
-          <ControllButton onClick={handleMicButton}>
-            {micOn ? '🔊' : '🔇'}
-          </ControllButton>
-          <ControllButton onClick={handleCameraButton}>
-            {!videoOn ? '🔴' : '⬛️'}
-          </ControllButton>
-        </ButtonContainer>
-        <Text>{text}</Text>
-      </DivWrapper>
-    </VideoContainer>
+          <UserVideoContainer
+                autoPlay
+                playsInline
+                ref={(ele) => {
+                  if (ele) {
+                    peerVideosRef.current[idx] = ele;
+                  }
+                }}
+                key={idx}
+            />
+        ))}
+        <DivWrapper>
+          <UserVideoContainer ref={videoRef} autoPlay muted playsInline />
+          <ButtonContainer>
+            <ControllButton onClick={handleMicButton}>
+              {micOn ? '🔊' : '🔔'}
+            </ControllButton>
+            <ControllButton onClick={handleCameraButton}>
+              {!videoOn ? '📸' : '🟥'}
+            </ControllButton>
+          </ButtonContainer>
+          <Text>{text}</Text>
+        </DivWrapper>
+      </VideoContainer>
   );
 };

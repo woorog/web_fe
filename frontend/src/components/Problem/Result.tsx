@@ -91,9 +91,9 @@ const Result = () => {
   });
 
   const textObj: ObjType = {
-    ready: '코드를 테스트하거나 제출해주세요!!',
-    run: '코드를 채점하고 있습니다',
-    complete: '채점 결과',
+    // ready: '코드를 테스트하거나 제출해주세요!!',
+    // run: '코드를 채점하고 있습니다',
+    // complete: '채점 결과',
   };
 
   const checkGrading = useCallback(() => {

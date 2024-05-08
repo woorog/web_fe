@@ -1,4 +1,4 @@
-import { Controller, Get, HttpStatus } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Query } from '@nestjs/common';
 
 import { AppService } from './app.service';
 import { UsersService } from './users/users.service';
@@ -10,6 +10,7 @@ import { ProblemService } from './problem/problem.service';
 import { CreateProblemDto } from './problem/dto/createProblem.dto';
 import { CreateTestCaseDto } from './test-case/dto/create-test-case.dto';
 import { TestCaseService } from './test-case/test-case.service';
+// import { CrawlerService } from './crawler/crawler.service';
 
 @Controller()
 export class AppController {
@@ -19,12 +20,30 @@ export class AppController {
     private readonly usersService: UsersService,
     private readonly problemService: ProblemService,
     private readonly solvedService: SolvedService,
+    // private readonly crawlerService: CrawlerService,
   ) {}
 
   @Get()
   getHello(): string {
     return this.appService.getHello();
   }
+
+  // @Get('crawl')
+  // async crawl(@Query('url') url: string) {
+  //   if (!url) {
+  //     return { statusCode: HttpStatus.BAD_REQUEST, message: "URL is required" };
+  //   }
+  //   try {
+  //     const content = await this.crawlerService.findOne(url);
+  //     return { data: content };
+  //   } catch (error) {
+  //     return {
+  //       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+  //       message: 'Failed to fetch the page',
+  //       error: error.message,
+  //     };
+  //   }
+  // }
 
   @Get('dummy')
   async createDummy() {

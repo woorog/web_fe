@@ -1,26 +1,40 @@
 const defaultCodes = {
-  JavaScript: `/*
-함수 내부에 실행 코드를 작성하세요
-*/
+//   JavaScript: `/*
+// 함수 내부에 실행 코드를 작성하세요
+// */
+//
+// function solution(param) {
+//
+//   let answer;
+//
+//   return answer;
+//
+// }`,
 
-function solution(param) {
+//   Python: `/*
+// 함수 내부에 실행 코드를 작성하세요
+// */
+//
+// def solution(param):
+//
+//   answer = 0
+//
+//   return answer
+//
+// }`,
 
-  let answer;
-
-  return answer;
+  JavaScript: `
+  
+  
 
 }`,
-  Python: `/*
-함수 내부에 실행 코드를 작성하세요
-*/
-
-def solution(param):
-
-  answer = 0
-
-  return answer
-
+  Python: `
+  
+  
+  
 }`,
+
+
   '': `/*
 
 언어를 선택하세요

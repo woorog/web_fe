@@ -16,7 +16,7 @@ import { TestCase } from './test-case/entities/test-case.entity';
 import { TestCaseModule } from './test-case/test-case.module';
 import { AuthModule } from './auth/auth.module';
 import { typeormConfig } from './config/typeorm.config';
-
+import { CrawlerModule } from './crawler/crawler.module';
 
 @Module({
   imports: [
@@ -47,6 +47,7 @@ import { typeormConfig } from './config/typeorm.config';
     TestCaseModule,
     SolvedModule,
     AuthModule,
+    CrawlerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

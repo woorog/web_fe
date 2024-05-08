@@ -92,14 +92,5 @@ yarn start
 공동 편집 기능으로 같이 코드를 편집할 수 있습니다.
 <br>
 <br>
-<img src="https://user-images.githubusercontent.com/62196278/208002548-e1054df1-8fae-44e0-a3cf-06778bcbdbee.png">
-문제를 풀면서 음성으로 그룹원들과 대화를 나눌 수 있습니다.
-<br>
-<br>
-
-<br/>
-
-|<img src="https://user-images.githubusercontent.com/46220202/200989306-054bb7c9-ff16-4258-a146-ce1cd6baac12.PNG" width="180">|<img src="https://user-images.githubusercontent.com/75344562/200989394-68ff559e-ce85-46b7-ae8c-4d9ea0d6e5f6.png" width="180">|<img src="https://user-images.githubusercontent.com/62196278/200988892-86c0d6bf-4daa-46b7-a429-1d857b1003d8.jpg" width="180">|<img src="https://user-images.githubusercontent.com/56079377/200989077-7aacef03-2b3a-4b56-b0b3-866ee07f0e79.jpg" width="180">
-|[@daepoid](https://github.com/daepoid)|[@tommy16102](https://github.com/tommy16102)|[@zsr12383](https://github.com/zsr12383)|[@sinterhoo](https://github.com/sinterhoo)|
 
 <br/>

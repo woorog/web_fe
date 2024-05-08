@@ -89,7 +89,6 @@
 //
 // export default List;
 
-
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Problem from './Problem';
@@ -150,19 +149,15 @@ const List = ({ list }: ListType) => {
     });
   }, [list]);
   return (
-      <>
-        <ListContainer>
-          {/*이부분이 방참가 1,2 부분 */}
-          {pagedList.length <= 7 &&
-              pagedList.map((elem, idx) => (
-                  <Problem
-                      key={elem.problemId}
-                      problem={elem}
-                      check={filter.check}
-                  />
-              ))}
-        </ListContainer>
-      </>
+    <>
+      <ListContainer>
+        {/*이부분이 방참가 1,2 부분 */}
+        {pagedList.length <= 7 &&
+          pagedList.map((elem, idx) => (
+            <Problem key={elem.problemId} problem={elem} check={filter.check} />
+          ))}
+      </ListContainer>
+    </>
   );
 };
 

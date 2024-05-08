@@ -25,16 +25,14 @@ export const MainHeader = () => {
 
   return (
     <MainHeaderContainer>
-      <AnchorLogo to={'/'}>
-        Camper<GreenMark>Rank</GreenMark>
+      {/* <AnchorLogo to={'/'}> */}
+      <AnchorLogo to={'/problems'}>
+        Oncore
       </AnchorLogo>
       <nav>
         <ul>
           <li>
-            <Link to="/problems">문제 리스트</Link>
-          </li>
-          <li>
-            <Link to="/ranking">랭킹</Link>
+            <Link to="/problems">방 찾기</Link>
           </li>
         </ul>
       </nav>

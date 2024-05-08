@@ -35,9 +35,7 @@ export const ProblemHeader = ({ URL, problemName, type }: propsType) => {
 
   return (
     <HeaderContainer>
-      <AnchorLogo to={'/'}>
-        Camper<GreenMark>Rank</GreenMark>
-      </AnchorLogo>
+      <AnchorLogo to={'/'}>OnCore</AnchorLogo>
       <div>
         <ul>
           <li>

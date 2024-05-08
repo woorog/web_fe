@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Banner, List } from '../components/Home';
+import { List } from '../components/Home';
 import { MainHeader } from '../components/MainHeader';
 import { Footer } from '../components/Footer';
 import { useUserState } from '../hooks/useUserState';
@@ -49,9 +49,9 @@ const Main = () => {
       <HeaderWrapper>
         <MainHeader></MainHeader>
       </HeaderWrapper>
-      <BannerWrapper>
+      {/* <BannerWrapper>
         <Banner></Banner>
-      </BannerWrapper>
+      </BannerWrapper> */}
       <ListWrapper>
         <List></List>
       </ListWrapper>

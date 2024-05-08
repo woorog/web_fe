@@ -64,7 +64,7 @@ export const SigninInputForm = () => {
         <AnchorLogo to={'/'}>
           Signin to
           <br />
-          Camper<GreenMark>Rank</GreenMark>
+          OnCore
         </AnchorLogo>
         <TextLink to={'/signup'}>↪ Go to Signup</TextLink>
       </InfoContainer>

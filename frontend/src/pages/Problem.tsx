@@ -62,17 +62,19 @@ const PageButtonsWrapper = styled.div`
   padding-top: 3rem;
 `;
 
+const Spacer = styled.div`
+  width: 10px; // 기본 너비
+  cursor: col-resize; // 커서 스타일 변경
+  background: #ccc; // 스페이서의 배경색
+`;
+
 const ProblemWrapper = styled.div`
-  width: 50%;
-  min-width: 15%;
-  height: auto;
+  display: flex;
+  flex-direction: row; // Align children side by side
+  width: 100%;
   padding: 1rem;
-  position: relative;
-
-  word-break: break-all;
-  overflow-x: hidden;
-  overflow-y: scroll;
-
+  overflow-x: hidden; // Handle overflowing content
+  overflow-y: auto; // Allow vertical scrolling
   ::-webkit-scrollbar {
     width: 20px;
   }
@@ -93,12 +95,54 @@ const ProblemWrapper = styled.div`
   }
 `;
 
+// const ProblemWrapper = styled.div`
+//   width: 50%;
+//   min-width: 15%;
+//   height: auto;
+//   padding: 1rem;
+//   position: relative;
+//
+//   word-break: break-all;
+//   overflow-x: hidden;
+//   overflow-y: scroll;
+//
+//   ::-webkit-scrollbar {
+//     width: 20px;
+//   }
+//
+//   ::-webkit-scrollbar-track {
+//     background-color: transparent;
+//   }
+//
+//   ::-webkit-scrollbar-thumb {
+//     background-color: #d6dee1;
+//     border-radius: 20px;
+//     border: 6px solid transparent;
+//     background-clip: content-box;
+//   }
+//
+//   ::-webkit-scrollbar-thumb:hover {
+//     background-color: #a8bbbf;
+//   }
+// `;
+
 const SolvingWrapper = styled.div`
   flex-grow: 1;
   height: 100%;
   display: flex;
   flex-direction: column;
   min-width: 25%;
+`;
+
+const VideoContainer = styled.div`
+  width: 30%; // Allocate 30% width for the video
+  height: 100%; // Match the height of the ProblemWrapper
+  background-color: #f0f0f0; // Optional background color for distinction
+`;
+
+const ContentContainer = styled.div`
+  width: 70%; // Allocate remaining 70% width for problem content
+  height: 100%; // Match the height of the ProblemWrapper
 `;
 
 const EditorWrapper = styled.div`
@@ -150,6 +194,13 @@ const ColSizeController = styled.div`
   background: #dce2de;
 `;
 
+const ColSizeController2 = styled.div`
+  height: 100%;
+  width: 1%;
+  cursor: col-resize;
+  background: #dce2de;
+`;
+
 const RowSizeController = styled.div`
   width: 100%;
   height: 1vw;
@@ -187,6 +238,32 @@ const Problem = () => {
   const [defaultCode, setDefaultCode] = useState({ ...defaultCodes });
   const problemRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
+
+  const [videoWidth, setVideoWidth] = useState(30); // VideoContainer의 초기 너비 퍼센트
+  const [isResizing, setIsResizing] = useState(false); // 리사이징 상태 관리
+
+  const handleMouseMove = (e: { clientX: number; }) => {
+    if (!isResizing || !problemRef.current) return; // 추가적인 null 체크
+    const newWidth = e.clientX - problemRef.current.getBoundingClientRect().left;
+    const percentageWidth = (newWidth / problemRef.current.clientWidth) * 100;
+    if (percentageWidth > 10 && percentageWidth < 90) {
+      console.log('Resizing to: ', percentageWidth);
+      setVideoWidth(percentageWidth); // 상태 업데이트
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsResizing(false);
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', handleMouseUp);
+  };
+
+  const handleMouseDown = (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    setIsResizing(true);
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
 
   const ydoc = useMemo(() => new Y.Doc(), []);
   const [provider, ytext] = useMemo(() => {
@@ -499,8 +576,15 @@ const Problem = () => {
           <PageButtons />
         </PageButtonsWrapper>
         <ProblemWrapper ref={problemRef}>
-          {version === 'multi' && <Video />}
-          {problem && <ProblemContent problem={problem}></ProblemContent>}
+          {version === 'multi' && (
+            <VideoContainer style={{ width: `${videoWidth}%` }}>
+              <Video />
+            </VideoContainer>
+          )}
+          <Spacer onMouseDown={handleMouseDown} />
+          <ContentContainer style={{ width: `${100 - videoWidth}%` }}>
+            {problem && <ProblemContent problem={problem} />}
+          </ContentContainer>
         </ProblemWrapper>
         <ColSizeController {...handleColSizeController}></ColSizeController>
         <SolvingWrapper>

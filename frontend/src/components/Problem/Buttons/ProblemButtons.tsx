@@ -153,7 +153,8 @@ const ProblemButtons = ({
     <>
       {buttonNames.map((name, idx) => (
         <Button
-          disabled={working}
+          // disabled={working}
+          disabled={true}
           key={idx}
           name={name}
           callback={callbackList[idx]}

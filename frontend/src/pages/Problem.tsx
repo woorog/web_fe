@@ -237,27 +237,27 @@ const Problem = () => {
   const [provider, ytext] = useMemo(() => {
     return [
       isMultiVersion
-        ? // @ts-ignore
+          ? // @ts-ignore
           new WebrtcProvider(roomNumber, ydoc, {
             signaling: [webRTCURL],
             maxConns: 3,
           })
-        : null,
+          : null,
       ydoc.getText('codemirror'),
     ];
   }, []);
 
   const undoManager = useMemo(() => new Y.UndoManager(ytext), []);
   const userColor = useMemo(
-    () => editorColors[random.uint32() % editorColors.length],
-    [],
+      () => editorColors[random.uint32() % editorColors.length],
+      [],
   );
 
   useEffect(() => {
     let lang = '';
     if (
-      text === defaultCode['JavaScript'] ||
-      text.includes('function solution')
+        text === defaultCode['JavaScript'] ||
+        text.includes('function solution')
     )
       lang = 'JavaScript';
     else if (text === defaultCode['Python'] || text.includes('def solution'))
@@ -289,26 +289,26 @@ const Problem = () => {
 
   useEffect(() => {
     fetch(`${URL}/problem/${id}`)
-      .then((res) => res.json())
-      .then((res) => {
-        const { level, title, description } = res;
-        setProblem({ level, title, description });
-      })
-      .catch(() => {
-        alert('문제를 불러올 수 없습니다');
-        navigate('/problems');
-      });
+        .then((res) => res.json())
+        .then((res) => {
+          const { level, title, description } = res;
+          setProblem({ level, title, description });
+        })
+        .catch(() => {
+          alert('문제를 불러올 수 없습니다');
+          navigate('/problems');
+        });
   }, [id]);
 
   useEffect(() => {
     if (!problem) return;
     fetch(`${URL}/test-case?problemId=${id}`)
-      .then((res) => res.json())
-      .then((res) => {
-        const testcase = res[0];
-        const { testInput } = testcase;
-        setParam(JSON.parse(testInput).length);
-      });
+        .then((res) => res.json())
+        .then((res) => {
+          const testcase = res[0];
+          const { testInput } = testcase;
+          setParam(JSON.parse(testInput).length);
+        });
   }, [problem]);
 
   useEffect(() => {
@@ -325,11 +325,11 @@ const Problem = () => {
   useEffect(() => {
     if (eView) return;
     provider &&
-      provider.awareness.setLocalStateField('user', {
-        name: 'Anonymous ' + Math.floor(Math.random() * 100),
-        color: userColor.color,
-        colorLight: userColor.light,
-      });
+    provider.awareness.setLocalStateField('user', {
+      name: 'Anonymous ' + Math.floor(Math.random() * 100),
+      color: userColor.color,
+      colorLight: userColor.light,
+    });
 
     const languageExtension = languageCompartment.of(langs['JavaScript']);
 
@@ -342,7 +342,7 @@ const Problem = () => {
       }),
     ];
     provider &&
-      extensions.push(yCollab(ytext, provider.awareness, { undoManager }));
+    extensions.push(yCollab(ytext, provider.awareness, { undoManager }));
 
     const state = EditorState.create({
       doc: ytext.toString(),
@@ -457,13 +457,13 @@ const Problem = () => {
     const PX = +REM.replace('px', '');
     if (editorRef.current)
       editorRef.current.style.maxWidth = `${Math.max(
-        80 * PX * 0.485,
-        window.innerWidth * 0.485,
+          80 * PX * 0.485,
+          window.innerWidth * 0.485,
       )}px`;
     if (problemRef.current)
       problemRef.current.style.width = `${Math.max(
-        80 * PX * 0.47,
-        window.innerWidth * 0.47,
+          80 * PX * 0.47,
+          window.innerWidth * 0.47,
       )}px`;
   };
 
@@ -474,18 +474,18 @@ const Problem = () => {
       const PX = +REM.replace('px', '');
       if (x > 0.175 * window.innerWidth)
         problemRef.current.style.width = `${Math.max(
-          80 * PX * 0.15,
-          x - window.innerWidth * 0.032,
+            80 * PX * 0.15,
+            x - window.innerWidth * 0.032,
         )}px`;
       const editorWidth = Math.max(
-        80 * PX * 0.95 - problemRefWidth,
-        window.innerWidth * 0.96 - problemRefWidth,
+          80 * PX * 0.95 - problemRefWidth,
+          window.innerWidth * 0.96 - problemRefWidth,
       );
       editorRef.current.style.width = `${editorWidth}px`;
       editorRef.current.style.maxWidth = `${editorWidth}px`;
       editorRef.current.style.minWidth = `${Math.max(
-        80 * PX * 0.25,
-        window.innerWidth * 0.25,
+          80 * PX * 0.25,
+          window.innerWidth * 0.25,
       )}px`;
     }
   };
@@ -494,7 +494,7 @@ const Problem = () => {
     if (editorRef.current != null) {
       const PX = +REM.replace('px', '');
       editorRef.current.style.height = `${
-        y - PX * 4 - window.innerWidth * 0.008
+          y - PX * 4 - window.innerWidth * 0.008
       }px`;
     }
   };
@@ -527,52 +527,59 @@ const Problem = () => {
   };
 
   return (
-    <Wrapper {...mainEventHandler}>
-      <HeaderWrapper>
-        <ProblemHeader
-          URL={
-            roomNumber
-              ? `/problem/${version}/${id}/${roomNumber}`
-              : `/problem/${version}/${id}`
-          }
-          problemName={problem?.title ? problem.title : ''}
-          type={0}
-        />
-      </HeaderWrapper>
-      <MainWrapper>
-        <PageButtonsWrapper>
-          <PageButtons />
-        </PageButtonsWrapper>
-        <ProblemWrapper ref={problemRef}>
-          {version === 'multi' && (
-            <VideoContainer>
-              <Video />
-            </VideoContainer>
-          )}
-          {/*여기부분에  <ContentContainer>  <VideoContainer>  둘 사이의 간격을 조절할수있게 만들어줘 */}
-          <ContentContainer>
-            {problem && <ProblemContent problem={problem} />}
-          </ContentContainer>
-        </ProblemWrapper>
-        <ColSizeController {...handleColSizeController}></ColSizeController>
-        <SolvingWrapper>
-          <EditorWrapper ref={editorRef}>
-            {eView && (
-              <LanguageSelector
-                onClickModalElement={handleChangeEditorLanguage}
-              />
+      <Wrapper {...mainEventHandler}>
+        <HeaderWrapper>
+          <ProblemHeader
+              URL={
+                roomNumber
+                    ? `/problem/${version}/${id}/${roomNumber}`
+                    : `/problem/${version}/${id}`
+              }
+              problemName={problem?.title ? problem.title : ''}
+              type={0}
+          />
+        </HeaderWrapper>
+        <MainWrapper>
+          <PageButtonsWrapper>
+            <PageButtons />
+          </PageButtonsWrapper>
+          <ProblemWrapper ref={problemRef}>
+            {version === 'multi' && (
+                <VideoContainer>
+                  <Video />
+                </VideoContainer>
             )}
-          </EditorWrapper>
-          <RowSizeController {...handleRowSizeController}></RowSizeController>
-          <ResultWrapper>
-            <Result></Result>
-          </ResultWrapper>
-          <ButtonsWrapper>
-            <ProblemButtons onClickClearBtn={handleClickClearButton} />
-          </ButtonsWrapper>
-        </SolvingWrapper>
-      </MainWrapper>
-    </Wrapper>
+            {/*여기부분에  <ContentContainer>  <VideoContainer>  둘 사이의 간격을 조절할수있게 만들어줘 */}
+            <ContentContainer>
+              {problem && <ProblemContent problem={problem} />}
+            </ContentContainer>
+          </ProblemWrapper>
+          <ColSizeController {...handleColSizeController}></ColSizeController>
+          <SolvingWrapper>
+
+            <EditorWrapper ref={editorRef}>
+              {'여기에 화이트보드 기능 들어가야함'}
+              {/*현재는 EditorWrapper 기능으로 해두었는데*/}
+              {/*test.tsx 만들어 뒀으니 연결해서 하면 됨*/}
+            </EditorWrapper>
+
+            <EditorWrapper ref={editorRef}>
+              {eView && (
+                  <LanguageSelector
+                      onClickModalElement={handleChangeEditorLanguage}
+                  />
+              )}
+            </EditorWrapper>
+            <RowSizeController {...handleRowSizeController}></RowSizeController>
+            <ResultWrapper>
+              <Result></Result>
+            </ResultWrapper>
+            <ButtonsWrapper>
+              <ProblemButtons onClickClearBtn={handleClickClearButton} />
+            </ButtonsWrapper>
+          </SolvingWrapper>
+        </MainWrapper>
+      </Wrapper>
   );
 };
 

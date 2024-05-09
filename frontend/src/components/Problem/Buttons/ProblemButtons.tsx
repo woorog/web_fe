@@ -59,7 +59,7 @@ const ProblemButtons = ({
 }: {
   onClickClearBtn: (str: string) => void;
 }) => {
-  const buttonNames = ['초기화', '코드테스트', '제출'];
+  const buttonNames = ['초기화', 'ai찬스', '보내기'];
   const [content] = useRecoilState(editorState);
   const [user] = useRecoilState(userState);
   const [grading, setGrading] = useRecoilState(gradingState);

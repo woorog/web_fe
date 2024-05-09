@@ -1,0 +1,18 @@
+const {
+    VITE_STUN_URL,
+    VITE_TURN_URL,
+    VITE_TURN_USERNAME,
+    VITE_TURN_CREDENTIAL,
+    VITE_SERVER_URL,
+    MODE,
+  } = import.meta.env;
+  
+  export {
+    VITE_STUN_URL,
+    VITE_TURN_URL,
+    VITE_TURN_USERNAME,
+    VITE_TURN_CREDENTIAL,
+    VITE_SERVER_URL,
+    MODE,
+  };
+  

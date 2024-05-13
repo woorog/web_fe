@@ -27,7 +27,8 @@ function ProblemViewSection() {
       inputRef.current.placeholder = '잘못된 URL입니다!';
       onReset();
       setTimeout(() => {
-        if (inputRef.current) inputRef.current.placeholder = '링크를 입력하세요';
+        if (inputRef.current)
+          inputRef.current.placeholder = '링크를 입력하세요';
       }, 1000);
       return;
     }
@@ -45,21 +46,23 @@ function ProblemViewSection() {
   if (error) return <ErrorView error={error} />;
 
   return (
-    <ProblemSection>
-      <div className="flex flex-col items-center justify-center w-full h-full gap-4 p-4">
-        <form onSubmit={handleSubmit} className="w-full ">
-          <input
-            ref={inputRef}
-            type="text"
-            className="w-full p-2 border rounded-lg"
-            value={ value }
-            onChange={onChange}
-            placeholder="링크를 입력하세요"
-          />
-        </form>
-        {data && url ? <ProblemIframe htmlData={data} /> : <ClickToProblemInput handleClick={handleClick} error={error} />}
-      </div>
-    </ProblemSection>
+    <div className="flex flex-col w-full h-screen">
+      <ProblemSection>
+        <div className="flex flex-col items-center justify-center w-full h-full gap-4 p-4">
+          <form onSubmit={handleSubmit} className="w-full ">
+            <input
+              ref={inputRef}
+              type="text"
+              className="w-full p-2 border rounded-lg"
+              value={ value }
+              onChange={onChange}
+              placeholder="링크를 입력하세요"
+            />
+          </form>
+          {data && url ? <ProblemIframe htmlData={data} /> : <ClickToProblemInput handleClick={handleClick} error={error} />}
+        </div>
+      </ProblemSection>
+    </div>
   );
 }
 

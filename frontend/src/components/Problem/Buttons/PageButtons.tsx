@@ -1,85 +1,31 @@
 import React, { useCallback } from 'react';
-import { useParams } from 'react-router-dom';
-import styled from 'styled-components';
 import { InviteModal } from '../InviteModal';
 import useModal from '../../../hooks/useModal';
 
-type ButtonProp = {
-  name: string;
-  callback: any;
-};
-
-const ButtonWrapper = styled.button`
-  width: 100%;
-  height: auto;
-  padding: 1rem 0;
-  background: #ffffff;
-  border: 1px solid #888888;
-
-  &:nth-child(1),
-  &:hover {
-    background: #eef5f0;
-    font-weight: 600;
-    border: none;
-  }
-
-  span {
-    writing-mode: vertical-lr;
-    font-size: 1rem;
-    letter-spacing: 3px;
-  }
-
-  :active {
-    background: #ffffff;
-    box-shadow: 0 5px #666;
-    transform: translateY(4px);
-  }
-`;
-
-const Button = ({ name, callback }: ButtonProp) => {
+const Button = ({ name, callback }: { name: string; callback: any }) => {
   return (
-    <ButtonWrapper onClick={callback}>
-      <span>{name}</span>
-    </ButtonWrapper>
+      <button
+          onClick={callback}
+          className="w-full py-4 bg-white border border-gray-400 hover:bg-teal-100 focus:bg-white active:bg-white active:translate-y-1 active:shadow-inner font-medium text-vertical-lr tracking-widest"
+      >
+        <span>{name}</span>
+      </button>
   );
 };
 
 const PageButtons = () => {
-  const { version } = useParams();
   const { isShowing, toggle } = useModal();
-
-  const setProblem = useCallback(() => {
-    return;
-  }, []);
-
-  const setQuestion = useCallback(() => {
-    return;
-  }, []);
-
-  const setTestcase = useCallback(() => {
-    return;
-  }, []);
 
   const invite = useCallback(() => {
     toggle();
-  }, [isShowing, toggle]);
-
-  // const buttonNames = ['문제', '질문', '테스트케이스'];
-  // const callbackList = [setProblem, setQuestion, setTestcase];
-  const buttonNames = ['문제'];
-  const callbackList = [setProblem];
-  if (version === 'multi') {
-    buttonNames.push('초대');
-    callbackList.push(invite);
-  }
+  }, [toggle]);
 
   return (
-    <>
-      {buttonNames.map((name, idx) => (
-        <Button key={idx} name={name} callback={callbackList[idx]} />
-      ))}
-      <InviteModal isShowing={isShowing} />
-    </>
+      <>
+        <Button name="초대" callback={invite} />
+        <InviteModal isShowing={isShowing} />
+      </>
   );
 };
+
 export default PageButtons;

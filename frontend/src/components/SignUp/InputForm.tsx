@@ -124,64 +124,83 @@ export const SignupInputForm = () => {
         });
     }
   };
+
+
+
   return (
-    <>
-      <AnchorLogo to={'/'}>
-        Signup for
-        <br />
-        On<GreenMark>Core</GreenMark>
-      </AnchorLogo>
-      <InputFormContainer>
-        <IDInputContainer>
-          <p>아이디</p>
-          <input
-            type={'text'}
-            placeholder={'영어/숫자 6자 이상'}
-            {...id}
-            ref={idRef}
-            onKeyPress={(e) => {
-              handleKeyPress(e, pwRef);
-            }}
-          />
-          <LightContainer style={{ marginRight: '8rem' }}>
-            {isIdRight ? '🔴' : '🟢'}
-          </LightContainer>
-          <CheckButton type={'button'} onClick={handleIdCheck}>
-            중복확인
-          </CheckButton>
-        </IDInputContainer>
-        <PasswordInputContainer>
-          <p>비밀번호</p>
-          <input
-            type={'password'}
-            placeholder={'영어/숫자/특수문자 8자 이상'}
-            {...pw}
-            ref={pwRef}
-            onKeyPress={(e) => {
-              handleKeyPress(e, pwCheckRef);
-            }}
-          />
-          <LightContainer>{isPwRight ? '🔴' : '🟢'}</LightContainer>
-        </PasswordInputContainer>
-        <PasswordInputContainer>
-          <p>비밀번호 확인</p>
-          <input
-            type={'password'}
-            placeholder={'영어/숫자/특수문자 8자 이상'}
-            {...pwCheck}
-            ref={pwCheckRef}
-          />
-          <LightContainer>{isPwRight ? '🔴' : '🟢'}</LightContainer>
-        </PasswordInputContainer>
-        <ButtonContainer>
-          <button type={'reset'} onClick={handleClear}>
-            초기화
-          </button>
-          <button type={'submit'} onClick={handleSubmit}>
-            회원가입
-          </button>
-        </ButtonContainer>
-      </InputFormContainer>
-    </>
+      <div
+          className="flex flex-col items-center justify-center w-full max-w-4xl px-8 py-10 bg-white shadow-lg rounded-xl">
+
+        <form className="w-full mt-8 space-y-6">
+          <div className="space-y-1">
+            <label htmlFor="id" className="block text-sm font-medium text-gray-700">ID</label>
+            <input
+                type="text"
+                placeholder="6자 이상"
+                {...id}
+                ref={idRef}
+                onKeyPress={(e) => handleKeyPress(e, pwRef)}
+                className="input input-bordered w-full max-w-lg"
+            />
+            <div className="mt-1">
+              {isIdRight ? (
+                  <span className="text-green-500">ID available</span>
+              ) : (
+                  <span className="text-red-500">ID not available</span>
+              )}
+            </div>
+            <button
+                type="button"
+                className="btn btn-primary mt-2"
+                onClick={handleIdCheck}
+            >
+              Check Availability
+            </button>
+          </div>
+          <div className="space-y-1">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+            <input
+                type="password"
+                placeholder="특수문자 포함 8자 이상"
+                {...pw}
+                ref={pwRef}
+                onKeyPress={(e) => handleKeyPress(e, pwCheckRef)}
+                className="input input-bordered w-full max-w-lg"
+            />
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirm
+              Password</label>
+            <input
+                type="password"
+                placeholder="Repeat your password"
+                {...pwCheck}
+                ref={pwCheckRef}
+                className="input input-bordered w-full max-w-lg"
+            />
+            <div className="mt-1">
+              {isPwRight ? (
+                  <span className="text-green-500">Passwords match</span>
+              ) : (
+                  <span className="text-red-500">Passwords do not match</span>
+              )}
+            </div>
+          </div>
+          <div className="flex justify-between">
+            <button
+                type="reset"
+                className="btn btn-secondary"
+                onClick={handleClear}
+            >
+              Clear
+            </button>
+            <button
+                type="submit"
+                className="btn btn-success"
+                onClick={handleSubmit}
+            >
+              Sign Up
+            </button>
+          </div>
+        </form>
+      </div>
   );
 };

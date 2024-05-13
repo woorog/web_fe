@@ -10,7 +10,7 @@ const ContentWrapper = styled.div`
   padding: 1.5rem;
   background: #f5fdf8;
   height: fit-content;
-  min-height: 75%;
+  min-height: 100%;
 `;
 
 const ProblemContent = ({ problem }: ProblemType) => {

@@ -1,105 +1,85 @@
+// React Router를 사용해 URL 파라미터 및 네비게이션 기능을 사용
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+// 다양한 UI 컴포넌트와 페이지 요소를 임포트
 import { PageButtons, ProblemButtons } from '../components/Problem/Buttons';
 import { ProblemHeader } from '../components/ProblemHeader';
 import { ProblemContent, Result } from '../components/Problem';
+// TypeScript 인터페이스나 타입 정의를 사용
 import { ProblemInfo } from '@types';
+// 상태 관리를 위한 Recoil 훅
 import { useRecoilState } from 'recoil';
 import { editorState, gradingState } from '../recoils';
+// Additional utility
 import { Video } from '../components/Problem/Video';
 import editorColors from '../utils/editorColors';
 import LanguageSelector from '../components/Problem/LanguageSelector';
 import defaultCodes from '../utils/defaultCode';
-
+// 실시간 협업을 위한 Yjs 라이브러리와 WebRTC 연동
 import * as Y from 'yjs';
 // @ts-ignore
 import { yCollab } from 'y-codemirror.next';
 import { WebrtcProvider } from 'y-webrtc';
-
+// 코드 미러 라이브러리를 사용한 텍스트 에디터 설정
 import { EditorView, basicSetup } from 'codemirror';
 import { EditorState, Compartment } from '@codemirror/state';
 import { javascript } from '@codemirror/lang-javascript';
 import { python } from '@codemirror/lang-python';
 import { keymap } from '@codemirror/view';
 import { indentWithTab } from '@codemirror/commands';
-
+// 추가적인 훅, 유틸리티 컴포넌트
 import * as random from 'lib0/random';
 import { useUserState } from '../hooks/useUserState';
+import Canvas from '../components/Canvas/Canvas';
+// CSS in JS
+import { Wrapper, HeaderWrapper, MainWrapper, PageButtonsWrapper, ProblemWrapper,
+  SolvingWrapper, VideoContainer, EditorWrapper, ResultWrapper, ButtonsWrapper,
+  ColSizeController, RowSizeController, ContentContainer,
+} from './ProblemStyle';
+import styled from 'styled-components';
 
-const Wrapper = styled.div`
-  width: 100%;
-  height: 100vh;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-`;
-
-const HeaderWrapper = styled.div`
-  width: 100%;
-  height: 4rem;
-  box-sizing: border-box;
-`;
-
-const MainWrapper = styled.div`
-  height: calc(100vh - 5rem);
-  min-width: 80rem;
-  max-height: calc(100vh - 5rem);
-  width: 100%;
-  flex-grow: 1;
-  border: 2px groove #dadada;
-  display: flex;
-  background: #eef5f0;
-`;
-
-const PageButtonsWrapper = styled.div`
-  height: 100%;
-  width: 2.5%;
-  padding-top: 3rem;
-`;
-
-const ProblemWrapper = styled.div`
-  display: flex;
-  flex-direction: row; // Align children side by side
-  width: 100%;
-  padding: 1rem;
-  overflow-x: hidden; // Handle overflowing content
-  overflow-y: auto; // Allow vertical scrolling
-
-  ::-webkit-scrollbar {
-    width: 20px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background-color: transparent;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background-color: #d6dee1;
-    border-radius: 20px;
-    border: 6px solid transparent;
-    background-clip: content-box;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background-color: #a8bbbf;
-  }
-`;
-
-// const ProblemWrapper = styled.div`
-//   width: 50%;
-//   min-width: 15%;
-//   height: auto;
-//   padding: 1rem;
-//   position: relative;
+// const Wrapper = styled.div`
+//   width: 100%;
+//   height: 100vh;
+//   margin: 0 auto;
+//   display: flex;
+//   flex-direction: column;
+//   -webkit-user-select: none;
+//   -moz-user-select: none;
+//   -ms-user-select: none;
+//   user-select: none;
+// `;
 //
-//   word-break: break-all;
-//   overflow-x: hidden;
-//   overflow-y: scroll;
+// const HeaderWrapper = styled.div`
+//   width: 100%;
+//   height: 4rem;
+//   box-sizing: border-box;
+// `;
+//
+// const MainWrapper = styled.div`
+//   height: calc(100vh - 5rem);
+//   min-width: 80rem;
+//   max-height: calc(100vh - 5rem);
+//   width: 100%;
+//   flex-grow: 1;
+//   border: 2px groove #dadada;
+//   display: flex;
+//   background: #eef5f0;
+// `;
+//
+// const PageButtonsWrapper = styled.div`
+//   height: 100%;
+//   width: 2.5%;
+//   padding-top: 3rem;
+// `;
+//
+// const ProblemWrapper = styled.div`
+//   display: flex;
+//   flex-direction: row; // Align children side by side
+//   width: 100%;
+//   padding: 1rem;
+//   overflow-x: hidden; // Handle overflowing content
+//   overflow-y: auto; // Allow vertical scrolling
 //
 //   ::-webkit-scrollbar {
 //     width: 20px;
@@ -121,86 +101,90 @@ const ProblemWrapper = styled.div`
 //   }
 // `;
 
-const SolvingWrapper = styled.div`
-  flex-grow: 1;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  min-width: 25%;
-`;
-
-const VideoContainer = styled.div`
-  width: 30%; // Allocate 30% width for the video
-  height: 85%; // Match the height of the ProblemWrapper
-`;
-
-const ContentContainer = styled.div`
-  width: 70%; // Allocate remaining 70% width for problem content
-  height: 100%; // Match the height of the ProblemWrapper
-`;
-
-const EditorWrapper = styled.div`
-  width: 100%;
-  height: 65%;
-  min-height: 10%;
-  padding: 0.8rem;
-  position: relative;
-  -webkit-user-select: text;
-  -moz-user-select: text;
-  -ms-user-select: text;
-  user-select: text;
-  overflow: auto;
-
-  .cm-editor.cm-focused {
-    outline: none;
-  }
-
-  .cm-activeLine,
-  .cm-activeLineGutter {
-    background: none;
-  }
-
-  .cm-editor {
-    border: 2px double #cbcbcb;
-    background: #f5fdf8;
-    border-radius: 5px;
-    min-height: 95%;
-  }
-`;
-
-const ResultWrapper = styled.div`
-  width: 100%;
-  min-height: 10%;
-  flex-grow: 1;
-`;
-
-const ButtonsWrapper = styled.div`
-  height: 6%;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-`;
-
-const ColSizeController = styled.div`
-  height: 100%;
-  width: 1%;
-  cursor: col-resize;
-  background: #dce2de;
-`;
-
-const ColSizeController2 = styled.div`
-  height: 100%;
-  width: 1%;
-  cursor: col-resize;
-  background: #dce2de;
-`;
-
-const RowSizeController = styled.div`
-  width: 100%;
-  height: 1vw;
-  cursor: row-resize;
-  background: #dce2de;
-`;
+//
+// const SolvingWrapper = styled.div`
+//   flex-grow: 1;
+//   height: 100%;
+//   display: flex;
+//   flex-direction: column;
+//   min-width: 25%;
+// `;
+//
+// const VideoContainer = styled.div`
+//   width: 30%; // Allocate 30% width for the video
+//   height: 85%; // Match the height of the ProblemWrapper
+// `;
+//
+// const ContentContainer = styled.div`
+//   width: 70%; // Allocate remaining 70% width for problem content
+//   height: 100%; // Match the height of the ProblemWrapper
+//   display: flex;
+//   align-items: stretch; // Ensure children stretch to fill the container vertically
+//   justify-content: stretch; // Ensure children stretch to fill the container horizontally
+// `;
+//
+// const EditorWrapper = styled.div`
+//   width: 100%;
+//   height: 65%;
+//   min-height: 10%;
+//   padding: 0.8rem;
+//   position: relative;
+//   -webkit-user-select: text;
+//   -moz-user-select: text;
+//   -ms-user-select: text;
+//   user-select: text;
+//   overflow: auto;
+//
+//   .cm-editor.cm-focused {
+//     outline: none;
+//   }
+//
+//   .cm-activeLine,
+//   .cm-activeLineGutter {
+//     background: none;
+//   }
+//
+//   .cm-editor {
+//     border: 2px double #cbcbcb;
+//     background: #f5fdf8;
+//     border-radius: 5px;
+//     min-height: 95%;
+//   }
+// `;
+//
+// const ResultWrapper = styled.div`
+//   width: 100%;
+//   min-height: 10%;
+//   flex-grow: 1;
+// `;
+//
+// const ButtonsWrapper = styled.div`
+//   height: 6%;
+//   display: flex;
+//   align-items: center;
+//   justify-content: flex-end;
+// `;
+//
+// const ColSizeController = styled.div`
+//   height: 100%;
+//   width: 1%;
+//   cursor: col-resize;
+//   background: #dce2de;
+// `;
+//
+// const ColSizeController2 = styled.div`
+//   height: 100%;
+//   width: 1%;
+//   cursor: col-resize;
+//   background: #dce2de;
+// `;
+//
+// const RowSizeController = styled.div`
+//   width: 100%;
+//   height: 1vw;
+//   cursor: row-resize;
+//   background: #dce2de;
+// `;
 
 const URL = import.meta.env.VITE_SERVER_URL;
 const REM = getComputedStyle(document.documentElement).fontSize;
@@ -237,27 +221,27 @@ const Problem = () => {
   const [provider, ytext] = useMemo(() => {
     return [
       isMultiVersion
-          ? // @ts-ignore
+        ? // @ts-ignore
           new WebrtcProvider(roomNumber, ydoc, {
             signaling: [webRTCURL],
             maxConns: 3,
           })
-          : null,
+        : null,
       ydoc.getText('codemirror'),
     ];
   }, []);
 
   const undoManager = useMemo(() => new Y.UndoManager(ytext), []);
   const userColor = useMemo(
-      () => editorColors[random.uint32() % editorColors.length],
-      [],
+    () => editorColors[random.uint32() % editorColors.length],
+    [],
   );
 
   useEffect(() => {
     let lang = '';
     if (
-        text === defaultCode['JavaScript'] ||
-        text.includes('function solution')
+      text === defaultCode['JavaScript'] ||
+      text.includes('function solution')
     )
       lang = 'JavaScript';
     else if (text === defaultCode['Python'] || text.includes('def solution'))
@@ -289,26 +273,26 @@ const Problem = () => {
 
   useEffect(() => {
     fetch(`${URL}/problem/${id}`)
-        .then((res) => res.json())
-        .then((res) => {
-          const { level, title, description } = res;
-          setProblem({ level, title, description });
-        })
-        .catch(() => {
-          alert('문제를 불러올 수 없습니다');
-          navigate('/problems');
-        });
+      .then((res) => res.json())
+      .then((res) => {
+        const { level, title, description } = res;
+        setProblem({ level, title, description });
+      })
+      .catch(() => {
+        alert('문제를 불러올 수 없습니다');
+        navigate('/problems');
+      });
   }, [id]);
 
   useEffect(() => {
     if (!problem) return;
     fetch(`${URL}/test-case?problemId=${id}`)
-        .then((res) => res.json())
-        .then((res) => {
-          const testcase = res[0];
-          const { testInput } = testcase;
-          setParam(JSON.parse(testInput).length);
-        });
+      .then((res) => res.json())
+      .then((res) => {
+        const testcase = res[0];
+        const { testInput } = testcase;
+        setParam(JSON.parse(testInput).length);
+      });
   }, [problem]);
 
   useEffect(() => {
@@ -325,11 +309,11 @@ const Problem = () => {
   useEffect(() => {
     if (eView) return;
     provider &&
-    provider.awareness.setLocalStateField('user', {
-      name: 'Anonymous ' + Math.floor(Math.random() * 100),
-      color: userColor.color,
-      colorLight: userColor.light,
-    });
+      provider.awareness.setLocalStateField('user', {
+        name: 'Anonymous ' + Math.floor(Math.random() * 100),
+        color: userColor.color,
+        colorLight: userColor.light,
+      });
 
     const languageExtension = languageCompartment.of(langs['JavaScript']);
 
@@ -342,7 +326,7 @@ const Problem = () => {
       }),
     ];
     provider &&
-    extensions.push(yCollab(ytext, provider.awareness, { undoManager }));
+      extensions.push(yCollab(ytext, provider.awareness, { undoManager }));
 
     const state = EditorState.create({
       doc: ytext.toString(),
@@ -457,13 +441,13 @@ const Problem = () => {
     const PX = +REM.replace('px', '');
     if (editorRef.current)
       editorRef.current.style.maxWidth = `${Math.max(
-          80 * PX * 0.485,
-          window.innerWidth * 0.485,
+        80 * PX * 0.485,
+        window.innerWidth * 0.485,
       )}px`;
     if (problemRef.current)
       problemRef.current.style.width = `${Math.max(
-          80 * PX * 0.47,
-          window.innerWidth * 0.47,
+        80 * PX * 0.47,
+        window.innerWidth * 0.47,
       )}px`;
   };
 
@@ -474,18 +458,18 @@ const Problem = () => {
       const PX = +REM.replace('px', '');
       if (x > 0.175 * window.innerWidth)
         problemRef.current.style.width = `${Math.max(
-            80 * PX * 0.15,
-            x - window.innerWidth * 0.032,
+          80 * PX * 0.15,
+          x - window.innerWidth * 0.032,
         )}px`;
       const editorWidth = Math.max(
-          80 * PX * 0.95 - problemRefWidth,
-          window.innerWidth * 0.96 - problemRefWidth,
+        80 * PX * 0.95 - problemRefWidth,
+        window.innerWidth * 0.96 - problemRefWidth,
       );
       editorRef.current.style.width = `${editorWidth}px`;
       editorRef.current.style.maxWidth = `${editorWidth}px`;
       editorRef.current.style.minWidth = `${Math.max(
-          80 * PX * 0.25,
-          window.innerWidth * 0.25,
+        80 * PX * 0.25,
+        window.innerWidth * 0.25,
       )}px`;
     }
   };
@@ -494,7 +478,7 @@ const Problem = () => {
     if (editorRef.current != null) {
       const PX = +REM.replace('px', '');
       editorRef.current.style.height = `${
-          y - PX * 4 - window.innerWidth * 0.008
+        y - PX * 4 - window.innerWidth * 0.008
       }px`;
     }
   };
@@ -527,59 +511,56 @@ const Problem = () => {
   };
 
   return (
-      <Wrapper {...mainEventHandler}>
-        <HeaderWrapper>
-          <ProblemHeader
-              URL={
-                roomNumber
-                    ? `/problem/${version}/${id}/${roomNumber}`
-                    : `/problem/${version}/${id}`
-              }
-              problemName={problem?.title ? problem.title : ''}
-              type={0}
-          />
-        </HeaderWrapper>
-        <MainWrapper>
-          <PageButtonsWrapper>
-            <PageButtons />
-          </PageButtonsWrapper>
-          <ProblemWrapper ref={problemRef}>
-            {version === 'multi' && (
-                <VideoContainer>
-                  <Video />
-                </VideoContainer>
+    <Wrapper {...mainEventHandler}>
+      <HeaderWrapper>
+        <ProblemHeader
+          URL={
+            roomNumber
+              ? `/problem/${version}/${id}/${roomNumber}`
+              : `/problem/${version}/${id}`
+          }
+          problemName={problem?.title ? problem.title : ''}
+          type={0}
+        />
+      </HeaderWrapper>
+      <MainWrapper>
+        <PageButtonsWrapper>
+          <PageButtons />
+        </PageButtonsWrapper>
+        <ProblemWrapper ref={problemRef}>
+          {version === 'multi' && (
+            <VideoContainer>
+              <Video />
+            </VideoContainer>
+          )}
+          {/*여기부분에  <ContentContainer>  <VideoContainer>  둘 사이의 간격을 조절할수있게 만들어줘 */}
+          <ContentContainer>
+            {problem && <ProblemContent problem={problem} />}
+          </ContentContainer>
+        </ProblemWrapper>
+        <ColSizeController {...handleColSizeController}></ColSizeController>
+        <SolvingWrapper>
+          <EditorWrapper ref={editorRef}>
+            < Canvas />
+          </EditorWrapper>
+
+          <EditorWrapper ref={editorRef}>
+            {eView && (
+              <LanguageSelector
+                onClickModalElement={handleChangeEditorLanguage}
+              />
             )}
-            {/*여기부분에  <ContentContainer>  <VideoContainer>  둘 사이의 간격을 조절할수있게 만들어줘 */}
-            <ContentContainer>
-              {problem && <ProblemContent problem={problem} />}
-            </ContentContainer>
-          </ProblemWrapper>
-          <ColSizeController {...handleColSizeController}></ColSizeController>
-          <SolvingWrapper>
-
-            <EditorWrapper ref={editorRef}>
-              {'여기에 화이트보드 기능 들어가야함'}
-              {/*현재는 EditorWrapper 기능으로 해두었는데*/}
-              {/*test.tsx 만들어 뒀으니 연결해서 하면 됨*/}
-            </EditorWrapper>
-
-            <EditorWrapper ref={editorRef}>
-              {eView && (
-                  <LanguageSelector
-                      onClickModalElement={handleChangeEditorLanguage}
-                  />
-              )}
-            </EditorWrapper>
-            <RowSizeController {...handleRowSizeController}></RowSizeController>
-            <ResultWrapper>
-              <Result></Result>
-            </ResultWrapper>
-            <ButtonsWrapper>
-              <ProblemButtons onClickClearBtn={handleClickClearButton} />
-            </ButtonsWrapper>
-          </SolvingWrapper>
-        </MainWrapper>
-      </Wrapper>
+          </EditorWrapper>
+          <RowSizeController {...handleRowSizeController}></RowSizeController>
+          <ResultWrapper>
+            <Result></Result>
+          </ResultWrapper>
+          <ButtonsWrapper>
+            <ProblemButtons onClickClearBtn={handleClickClearButton} />
+          </ButtonsWrapper>
+        </SolvingWrapper>
+      </MainWrapper>
+    </Wrapper>
   );
 };
 

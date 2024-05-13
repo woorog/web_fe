@@ -14,6 +14,11 @@ const clickDisable = (document: Document) => {
   );
 };
 
+interface ProblemIframeProps {
+  htmlData?: string;
+  className?: string;  // Optional className prop
+}
+
 export default function ProblemIframe({ htmlData }: { htmlData?: string }) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   useEffect(() => {

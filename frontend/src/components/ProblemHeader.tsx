@@ -16,8 +16,6 @@ interface propsType {
   problemName: string;
   type: number;
   roomNumber?: string;
-  //0: 문제풀이 페이지
-  //1: 질문 페이지
 }
 
 export const ProblemHeader = ({ URL, problemName, type }: propsType) => {
@@ -39,11 +37,8 @@ export const ProblemHeader = ({ URL, problemName, type }: propsType) => {
       <div>
         <ul>
           <li>
-            <Link to="/problems">문제 리스트</Link>
+            <Link to="/problems"></Link>
           </li>
-          {/*<li>*/}
-          {/*  <Greater className={'greater'} />*/}
-          {/*</li>*/}
           <li>
             <Link to={URL}>{problemName}</Link>
           </li>

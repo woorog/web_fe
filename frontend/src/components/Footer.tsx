@@ -1,14 +1,9 @@
-import {
-  ButtonContainer,
-  FooterContainer,
-  KeyPhrase,
-  MainText,
-} from '../styles/Footer.style';
+import React from 'react';
 
 export const Footer = () => {
   return (
-    <FooterContainer>
-      <KeyPhrase>Online Core Time</KeyPhrase>
-    </FooterContainer>
+    <div className="bg-black-800 p-4 text-center">
+      <h1 className="text-white text-9xl">Online Core Time</h1>
+    </div>
   );
 };

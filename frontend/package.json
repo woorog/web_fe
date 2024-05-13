@@ -35,9 +35,11 @@
     "recoil": "^0.7.6",
     "socket.io-client": "^4.5.4",
     "styled-components": "^5.3.6",
+    "tldraw": "^2.1.4",
     "vite-plugin-svgr": "^2.2.2",
     "y-codemirror.next": "^0.3.2",
     "y-indexeddb": "^9.0.9",
+    "y-utility": "^0.1.4",
     "y-webrtc": "^10.2.3",
     "y-websocket": "^1.4.5",
     "yjs": "^13.5.42"

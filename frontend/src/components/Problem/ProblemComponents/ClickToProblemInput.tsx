@@ -1,4 +1,4 @@
-import clickSrc from '@/assets/click.svg';
+import clickSrc from '../../../assets/click.svg';
 import ErrorView from './ErrorView';
 
 interface ClickToQuizInputProps {

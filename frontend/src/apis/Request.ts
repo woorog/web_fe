@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { VITE_SERVER_URL, MODE } from '@/constants/env';
+import { VITE_SERVER_URL, MODE } from '../constants/env';
 
 const Request = axios.create({
   // baseURL: MODE === 'development' ? '/' : VITE_SERVER_URL,

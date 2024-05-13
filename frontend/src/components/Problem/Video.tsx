@@ -6,15 +6,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { socketState } from '../../recoils';
 
-// const VideoContainer = styled.div`
-//   margin-top: 1rem;
-//   width: 100%;
-//   height: 9rem;
-//   display: flex;
-//   justify-content: right;
-//   align-items: center;
-// `;
-
 const VideoContainer = styled.div`
   margin-top: 1rem;
   width: 100%;
@@ -32,6 +23,7 @@ const UserVideoContainer = styled.video`
   max-height: 9rem;
   height: auto; // Maintain aspect ratio
   margin-bottom: 1rem; // Space between videos
+  background-color: #FFFFFF; // 배경을 흰색으로 설정
 `;
 
 const DivWrapper = styled.div`
@@ -47,27 +39,6 @@ const DivWrapper = styled.div`
     width: 100%;
   }
 `;
-
-// const UserVideoContainer = styled.video`
-//   max-width: 16rem;
-//   width: 33%;
-//   max-height: 9rem;
-//   height: auto;
-//   margin-right: 2px;
-// `;
-//
-// const DivWrapper = styled.div`
-//   position: relative;
-//   max-height: 9rem;
-//   max-width: 16rem;
-//   width: 33%;
-//   height: auto;
-//
-//   video {
-//     width: 100%;
-//     margin-right: 0;
-//   }
-// `;
 
 const ButtonContainer = styled.div`
   position: absolute;

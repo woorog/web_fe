@@ -55,12 +55,6 @@ const List = () => {
   }, [user]);
   return (
     <ListWrapper>
-      <ListTitle>오늘의 랜덤 문제</ListTitle>
-      <ProblemListWrapper>
-        {problems.map((elem, idx) => (
-          <Problem key={idx} problem={elem}></Problem>
-        ))}
-      </ProblemListWrapper>
     </ListWrapper>
   );
 };

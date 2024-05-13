@@ -62,12 +62,6 @@ const PageButtonsWrapper = styled.div`
   padding-top: 3rem;
 `;
 
-const Spacer = styled.div`
-  width: 10px; // 기본 너비
-  cursor: col-resize; // 커서 스타일 변경
-  background: #ccc; // 스페이서의 배경색
-`;
-
 const ProblemWrapper = styled.div`
   display: flex;
   flex-direction: row; // Align children side by side
@@ -75,6 +69,7 @@ const ProblemWrapper = styled.div`
   padding: 1rem;
   overflow-x: hidden; // Handle overflowing content
   overflow-y: auto; // Allow vertical scrolling
+
   ::-webkit-scrollbar {
     width: 20px;
   }
@@ -95,37 +90,6 @@ const ProblemWrapper = styled.div`
   }
 `;
 
-// const ProblemWrapper = styled.div`
-//   width: 50%;
-//   min-width: 15%;
-//   height: auto;
-//   padding: 1rem;
-//   position: relative;
-//
-//   word-break: break-all;
-//   overflow-x: hidden;
-//   overflow-y: scroll;
-//
-//   ::-webkit-scrollbar {
-//     width: 20px;
-//   }
-//
-//   ::-webkit-scrollbar-track {
-//     background-color: transparent;
-//   }
-//
-//   ::-webkit-scrollbar-thumb {
-//     background-color: #d6dee1;
-//     border-radius: 20px;
-//     border: 6px solid transparent;
-//     background-clip: content-box;
-//   }
-//
-//   ::-webkit-scrollbar-thumb:hover {
-//     background-color: #a8bbbf;
-//   }
-// `;
-
 const SolvingWrapper = styled.div`
   flex-grow: 1;
   height: 100%;
@@ -136,8 +100,7 @@ const SolvingWrapper = styled.div`
 
 const VideoContainer = styled.div`
   width: 30%; // Allocate 30% width for the video
-  height: 100%; // Match the height of the ProblemWrapper
-  background-color: #f0f0f0; // Optional background color for distinction
+  height: 85%; // Match the height of the ProblemWrapper
 `;
 
 const ContentContainer = styled.div`
@@ -228,68 +191,45 @@ const Problem = () => {
   const [, setEState] = useState<EditorState>();
   const [eView, setEView] = useState<EditorView>();
   const [problem, setProblem] = useState<ProblemInfo>();
-  const { id, version } = useParams();
+  const { id, version, roomNumber = '' } = useParams();
   const [isMultiVersion] = useState(version === 'multi');
   const [code, setCode] = useRecoilState(editorState);
   const [language, setLanguage] = useState(code.language);
   const [text, setText] = useState(code.text);
   const [param, setParam] = useState(1);
-  const { roomNumber } = isMultiVersion ? useParams() : { roomNumber: null };
+  // const { roomNumber } = isMultiVersion ? useParams() : { roomNumber: '' };
   const [defaultCode, setDefaultCode] = useState({ ...defaultCodes });
   const problemRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
 
-  const [videoWidth, setVideoWidth] = useState(30); // VideoContainer의 초기 너비 퍼센트
-  const [isResizing, setIsResizing] = useState(false); // 리사이징 상태 관리
-
-  const handleMouseMove = (e: { clientX: number; }) => {
-    if (!isResizing || !problemRef.current) return; // 추가적인 null 체크
-    const newWidth = e.clientX - problemRef.current.getBoundingClientRect().left;
-    const percentageWidth = (newWidth / problemRef.current.clientWidth) * 100;
-    if (percentageWidth > 10 && percentageWidth < 90) {
-      console.log('Resizing to: ', percentageWidth);
-      setVideoWidth(percentageWidth); // 상태 업데이트
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsResizing(false);
-    document.removeEventListener('mousemove', handleMouseMove);
-    document.removeEventListener('mouseup', handleMouseUp);
-  };
-
-  const handleMouseDown = (e: { preventDefault: () => void }) => {
-    e.preventDefault();
-    setIsResizing(true);
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-  };
+  const { user, logoutHandler } = useUserState();
+  const [socket, setSocket] = useState(null);
 
   const ydoc = useMemo(() => new Y.Doc(), []);
   const [provider, ytext] = useMemo(() => {
     return [
       isMultiVersion
-        ? // @ts-ignore
+          ? // @ts-ignore
           new WebrtcProvider(roomNumber, ydoc, {
             signaling: [webRTCURL],
-            maxConns: 3,
+            maxConns: 4,
           })
-        : null,
+          : null,
       ydoc.getText('codemirror'),
     ];
   }, []);
 
   const undoManager = useMemo(() => new Y.UndoManager(ytext), []);
   const userColor = useMemo(
-    () => editorColors[random.uint32() % editorColors.length],
-    [],
+      () => editorColors[random.uint32() % editorColors.length],
+      [],
   );
 
   useEffect(() => {
     let lang = '';
     if (
-      text === defaultCode['JavaScript'] ||
-      text.includes('function solution')
+        text === defaultCode['JavaScript'] ||
+        text.includes('function solution')
     )
       lang = 'JavaScript';
     else if (text === defaultCode['Python'] || text.includes('def solution'))
@@ -321,26 +261,26 @@ const Problem = () => {
 
   useEffect(() => {
     fetch(`${URL}/problem/${id}`)
-      .then((res) => res.json())
-      .then((res) => {
-        const { level, title, description } = res;
-        setProblem({ level, title, description });
-      })
-      .catch(() => {
-        alert('문제를 불러올 수 없습니다');
-        navigate('/problems');
-      });
+        .then((res) => res.json())
+        .then((res) => {
+          const { level, title, description } = res;
+          setProblem({ level, title, description });
+        })
+        .catch(() => {
+          alert('문제를 불러올 수 없습니다');
+          navigate('/problems');
+        });
   }, [id]);
 
   useEffect(() => {
     if (!problem) return;
     fetch(`${URL}/test-case?problemId=${id}`)
-      .then((res) => res.json())
-      .then((res) => {
-        const testcase = res[0];
-        const { testInput } = testcase;
-        setParam(JSON.parse(testInput).length);
-      });
+        .then((res) => res.json())
+        .then((res) => {
+          const testcase = res[0];
+          const { testInput } = testcase;
+          setParam(JSON.parse(testInput).length);
+        });
   }, [problem]);
 
   useEffect(() => {
@@ -357,11 +297,11 @@ const Problem = () => {
   useEffect(() => {
     if (eView) return;
     provider &&
-      provider.awareness.setLocalStateField('user', {
-        name: 'Anonymous ' + Math.floor(Math.random() * 100),
-        color: userColor.color,
-        colorLight: userColor.light,
-      });
+    provider.awareness.setLocalStateField('user', {
+      name: 'Anonymous ' + Math.floor(Math.random() * 100),
+      color: userColor.color,
+      colorLight: userColor.light,
+    });
 
     const languageExtension = languageCompartment.of(langs['JavaScript']);
 
@@ -374,7 +314,7 @@ const Problem = () => {
       }),
     ];
     provider &&
-      extensions.push(yCollab(ytext, provider.awareness, { undoManager }));
+    extensions.push(yCollab(ytext, provider.awareness, { undoManager }));
 
     const state = EditorState.create({
       doc: ytext.toString(),
@@ -489,13 +429,13 @@ const Problem = () => {
     const PX = +REM.replace('px', '');
     if (editorRef.current)
       editorRef.current.style.maxWidth = `${Math.max(
-        80 * PX * 0.485,
-        window.innerWidth * 0.485,
+          80 * PX * 0.485,
+          window.innerWidth * 0.485,
       )}px`;
     if (problemRef.current)
       problemRef.current.style.width = `${Math.max(
-        80 * PX * 0.47,
-        window.innerWidth * 0.47,
+          80 * PX * 0.47,
+          window.innerWidth * 0.47,
       )}px`;
   };
 
@@ -506,18 +446,18 @@ const Problem = () => {
       const PX = +REM.replace('px', '');
       if (x > 0.175 * window.innerWidth)
         problemRef.current.style.width = `${Math.max(
-          80 * PX * 0.15,
-          x - window.innerWidth * 0.032,
+            80 * PX * 0.15,
+            x - window.innerWidth * 0.032,
         )}px`;
       const editorWidth = Math.max(
-        80 * PX * 0.95 - problemRefWidth,
-        window.innerWidth * 0.96 - problemRefWidth,
+          80 * PX * 0.95 - problemRefWidth,
+          window.innerWidth * 0.96 - problemRefWidth,
       );
       editorRef.current.style.width = `${editorWidth}px`;
       editorRef.current.style.maxWidth = `${editorWidth}px`;
       editorRef.current.style.minWidth = `${Math.max(
-        80 * PX * 0.25,
-        window.innerWidth * 0.25,
+          80 * PX * 0.25,
+          window.innerWidth * 0.25,
       )}px`;
     }
   };
@@ -526,7 +466,7 @@ const Problem = () => {
     if (editorRef.current != null) {
       const PX = +REM.replace('px', '');
       editorRef.current.style.height = `${
-        y - PX * 4 - window.innerWidth * 0.008
+          y - PX * 4 - window.innerWidth * 0.008
       }px`;
     }
   };
@@ -559,52 +499,59 @@ const Problem = () => {
   };
 
   return (
-    <Wrapper {...mainEventHandler}>
-      <HeaderWrapper>
-        <ProblemHeader
-          URL={
-            roomNumber
-              ? `/problem/${version}/${id}/${roomNumber}`
-              : `/problem/${version}/${id}`
-          }
-          problemName={problem?.title ? problem.title : ''}
-          type={0}
-        />
-      </HeaderWrapper>
-      <MainWrapper>
-        <PageButtonsWrapper>
-          <PageButtons />
-        </PageButtonsWrapper>
-        <ProblemWrapper ref={problemRef}>
-          {version === 'multi' && (
-            <VideoContainer style={{ width: `${videoWidth}%` }}>
-              <Video />
-            </VideoContainer>
-          )}
-          <Spacer onMouseDown={handleMouseDown} />
-          <ContentContainer style={{ width: `${100 - videoWidth}%` }}>
-            {problem && <ProblemContent problem={problem} />}
-          </ContentContainer>
-        </ProblemWrapper>
-        <ColSizeController {...handleColSizeController}></ColSizeController>
-        <SolvingWrapper>
-          <EditorWrapper ref={editorRef}>
-            {eView && (
-              <LanguageSelector
-                onClickModalElement={handleChangeEditorLanguage}
-              />
+      <Wrapper {...mainEventHandler}>
+        <HeaderWrapper>
+          <ProblemHeader
+              URL={
+                roomNumber
+                    ? `/problem/${version}/${id}/${roomNumber}`
+                    : `/problem/${version}/${id}`
+              }
+              problemName={problem?.title ? problem.title : ''}
+              type={0}
+          />
+        </HeaderWrapper>
+        <MainWrapper>
+          <PageButtonsWrapper>
+            <PageButtons />
+          </PageButtonsWrapper>
+          <ProblemWrapper ref={problemRef}>
+            {version === 'multi' && (
+                <VideoContainer>
+                  <Video />
+                </VideoContainer>
             )}
-          </EditorWrapper>
-          <RowSizeController {...handleRowSizeController}></RowSizeController>
-          <ResultWrapper>
-            <Result></Result>
-          </ResultWrapper>
-          <ButtonsWrapper>
-            <ProblemButtons onClickClearBtn={handleClickClearButton} />
-          </ButtonsWrapper>
-        </SolvingWrapper>
-      </MainWrapper>
-    </Wrapper>
+            {/*여기부분에  <ContentContainer>  <VideoContainer>  둘 사이의 간격을 조절할수있게 만들어줘 */}
+            <ContentContainer>
+              {problem && <ProblemContent problem={problem} />}
+            </ContentContainer>
+          </ProblemWrapper>
+          <ColSizeController {...handleColSizeController}></ColSizeController>
+          <SolvingWrapper>
+
+            <EditorWrapper ref={editorRef}>
+              {'여기에 화이트보드 기능 들어가야함'}
+              {/*현재는 EditorWrapper 기능으로 해두었는데*/}
+              {/*test.tsx 만들어 뒀으니 연결해서 하면 됨*/}
+            </EditorWrapper>
+
+            <EditorWrapper ref={editorRef}>
+              {eView && (
+                  <LanguageSelector
+                      onClickModalElement={handleChangeEditorLanguage}
+                  />
+              )}
+            </EditorWrapper>
+            <RowSizeController {...handleRowSizeController}></RowSizeController>
+            <ResultWrapper>
+              <Result roomNumber={roomNumber} />
+            </ResultWrapper>
+            <ButtonsWrapper>
+              <ProblemButtons onClickClearBtn={handleClickClearButton} />
+            </ButtonsWrapper>
+          </SolvingWrapper>
+        </MainWrapper>
+      </Wrapper>
   );
 };
 

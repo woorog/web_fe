@@ -73,11 +73,15 @@ npx y-webrtc
 cd socket
 yarn dev
 
+cd chat
+yarn start
+
 cd grading
 yarn start
-```
 
 redis-server
+```
+
 
 <br>
 

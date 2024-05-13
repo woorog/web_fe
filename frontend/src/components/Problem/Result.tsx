@@ -17,11 +17,12 @@ const ResultWrapper = styled.div`
 `;
 
 const Result: React.FC<ResultProps> = ({ roomNumber }) => {
-  return (
-      <ResultWrapper>
-          <ChattingSection roomNumber={roomNumber} />
-      </ResultWrapper>
-  );
+    return (
+        <div
+            className="flex flex-col items-center justify-center w-full p-4 bg-gray-100 shadow-lg h-96 overflow-y-auto">
+            <ChattingSection roomNumber={roomNumber}/>
+        </div>
+    );
 };
 
 export default Result;

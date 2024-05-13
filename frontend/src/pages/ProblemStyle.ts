@@ -108,42 +108,33 @@ export const VideoContainer = styled.div`
 `;
 
 export const ContentContainer = styled.div`
-  width: 70%; // Allocate remaining 70% width for problem content
-  height: 100%; // Match the height of the ProblemWrapper
+    width: 100%; // Allocate 30% width for the video
+    height: 85%; // Match the height of the ProblemWrapper
 `;
 
+export const CompilerContainer = styled.div`
+    width: 100%; // Allocate 30% width for the video
+    height: 25%; // Match the height of the ProblemWrapper
+`;
+
+
 export const EditorWrapper = styled.div`
-  width: 100%;
-  height: 65%;
-  min-height: 10%;
-  padding: 0.8rem;
-  position: relative;
-  -webkit-user-select: text;
-  -moz-user-select: text;
-  -ms-user-select: text;
-  user-select: text;
-  overflow: auto;
-
-  .cm-editor.cm-focused {
-    outline: none;
-  }
-
-  .cm-activeLine,
-  .cm-activeLineGutter {
-    background: none;
-  }
-
-  .cm-editor {
-    border: 2px double #cbcbcb;
-    background: #f5fdf8;
-    border-radius: 5px;
-    min-height: 95%;
-  }
+    width: 100%;  // 부모 컨테이너의 너비에 맞춤
+    height: calc(100% - 2rem);  // 부모의 높이에서 2rem 만큼 빼고 사용
+    min-height: 10%;  // 최소 높이 설정
+    padding: 0.8rem;
+    position: relative;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+    overflow: auto;
+    
 `;
 
 export const ResultWrapper = styled.div`
   width: 100%;
-  min-height: 10%;
+  height: 70%;
   flex-grow: 1;
 `;
 

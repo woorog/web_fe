@@ -32,11 +32,22 @@ import * as random from 'lib0/random';
 import { useUserState } from '../hooks/useUserState';
 import Canvas from '../components/Canvas/Canvas';
 // CSS in JS
-import { Wrapper, HeaderWrapper, MainWrapper, PageButtonsWrapper, ProblemWrapper,
-  SolvingWrapper, VideoContainer, EditorWrapper, ResultWrapper, ButtonsWrapper,
-  ColSizeController, RowSizeController, ContentContainer,
+import {
+  Wrapper,
+  HeaderWrapper,
+  MainWrapper,
+  PageButtonsWrapper,
+  ProblemWrapper,
+  SolvingWrapper,
+  VideoContainer,
+  EditorWrapper,
+  ResultWrapper,
+  ButtonsWrapper,
+  ColSizeController,
+  RowSizeController,
+  ContentContainer,
+  CompilerContainer,
 } from './ProblemStyle';
-
 
 const URL = import.meta.env.VITE_SERVER_URL;
 const REM = getComputedStyle(document.documentElement).fontSize;
@@ -51,20 +62,40 @@ const langs = {
 
 const Problem = () => {
   useUserState();
+
+  const startResizing = (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    document.addEventListener('mousemove', resize);
+    document.addEventListener('mouseup', stopResize);
+  };
+
+  const resize = (e: { movementY: number }) => {
+    if (editorRef.current) {
+      // null 체크 추가
+      const currentHeight = editorRef.current.clientHeight;
+      const newHeight = currentHeight + e.movementY;
+      editorRef.current.style.height = `${newHeight}px`;
+    }
+  };
+  const stopResize = () => {
+    document.removeEventListener('mousemove', resize);
+    document.removeEventListener('mouseup', stopResize);
+  };
+
+  const [leftWidth, setLeftWidth] = useState(50); // 초기 왼쪽 패널 너비 (퍼센트)
+  const [showEditor, setShowEditor] = useState(true);
   const navigate = useNavigate();
-  const [moveColResize, setMoveColResize] = useState(false);
-  const [moveRowResize, setMoveRowResize] = useState(false);
   const [, setGrade] = useRecoilState(gradingState);
   const [, setEState] = useState<EditorState>();
   const [eView, setEView] = useState<EditorView>();
   const [problem, setProblem] = useState<ProblemInfo>();
-  const { id, version } = useParams();
+  const { id, version, roomNumber = '' } = useParams();
   const [isMultiVersion] = useState(version === 'multi');
   const [code, setCode] = useRecoilState(editorState);
   const [language, setLanguage] = useState(code.language);
   const [text, setText] = useState(code.text);
   const [param, setParam] = useState(1);
-  const { roomNumber } = isMultiVersion ? useParams() : { roomNumber: null };
+  // const { roomNumber } = isMultiVersion ? useParams() : { roomNumber: null };
   const [defaultCode, setDefaultCode] = useState({ ...defaultCodes });
   const problemRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
@@ -274,21 +305,6 @@ const Problem = () => {
       eView.dispatch(transaction);
     }
   };
-
-  const handleClickClearButton = () => {
-    if (eView) {
-      let insertCode;
-      const { text: priorText, language: priorLanguage } = code;
-      saveCode(priorText, priorLanguage);
-      if (language === '' || language === 'JavaScript' || language === 'Python')
-        insertCode = defaultCode[language];
-      const transaction = eView.state.update({
-        changes: { from: 0, to: eView.state.doc.length, insert: insertCode },
-      });
-      eView.dispatch(transaction);
-    }
-  };
-
   const handleSize = () => {
     const PX = +REM.replace('px', '');
     if (editorRef.current)
@@ -302,68 +318,29 @@ const Problem = () => {
         window.innerWidth * 0.47,
       )}px`;
   };
+  const handleMouseDown = (event) => {
+    event.preventDefault();
+    const startX = event.clientX;
+    const startWidth = leftWidth;
 
-  const resizeProblemWrapper = (x: number) => {
-    if (problemRef.current != null && editorRef.current != null) {
-      const problemRefWidth = +problemRef.current.style.width.replace('px', '');
-      +editorRef.current.style.maxWidth.replace('px', '');
-      const PX = +REM.replace('px', '');
-      if (x > 0.175 * window.innerWidth)
-        problemRef.current.style.width = `${Math.max(
-          80 * PX * 0.15,
-          x - window.innerWidth * 0.032,
-        )}px`;
-      const editorWidth = Math.max(
-        80 * PX * 0.95 - problemRefWidth,
-        window.innerWidth * 0.96 - problemRefWidth,
-      );
-      editorRef.current.style.width = `${editorWidth}px`;
-      editorRef.current.style.maxWidth = `${editorWidth}px`;
-      editorRef.current.style.minWidth = `${Math.max(
-        80 * PX * 0.25,
-        window.innerWidth * 0.25,
-      )}px`;
-    }
-  };
+    const handleMouseMove = (moveEvent) => {
+      const currentX = moveEvent.clientX;
+      const dx = currentX - startX;
+      const newWidth = startWidth + (dx / window.innerWidth * 100); // 창 너비에 대한 백분율로 계산
+      setLeftWidth(Math.max(10, Math.min(90, newWidth))); // 10% ~ 90% 범위 내로 제한
+    };
 
-  const resizeEditorWrapper = (y: number) => {
-    if (editorRef.current != null) {
-      const PX = +REM.replace('px', '');
-      editorRef.current.style.height = `${
-        y - PX * 4 - window.innerWidth * 0.008
-      }px`;
-    }
-  };
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
 
-  const mainEventHandler = {
-    onMouseMove: (e: React.MouseEvent<HTMLDivElement>) => {
-      if (moveColResize) resizeProblemWrapper(e.clientX);
-      else if (moveRowResize) resizeEditorWrapper(e.clientY);
-    },
-    onMouseUp: () => {
-      setMoveColResize(false);
-      setMoveRowResize(false);
-    },
-    onMouseLeave: () => {
-      setMoveColResize(false);
-      setMoveRowResize(false);
-    },
-  };
-
-  const handleColSizeController = {
-    onMouseDown: () => {
-      setMoveColResize(true);
-    },
-  };
-
-  const handleRowSizeController = {
-    onMouseDown: () => {
-      setMoveRowResize(true);
-    },
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
   };
 
   return (
-    <Wrapper {...mainEventHandler}>
+    <Wrapper>
       <HeaderWrapper>
         <ProblemHeader
           URL={
@@ -379,38 +356,67 @@ const Problem = () => {
         <PageButtonsWrapper>
           <PageButtons />
         </PageButtonsWrapper>
-        <ProblemWrapper ref={problemRef}>
+
+        <div className="flex flex-row w-full p-4 overflow-x-hidden overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400">
           {version === 'multi' && (
             <VideoContainer>
               <Video />
             </VideoContainer>
           )}
-          {/*여기부분에  <ContentContainer>  <VideoContainer>  둘 사이의 간격을 조절할수있게 만들어줘 */}
+          <div className="relative w-full h-full">
+            <div
+              className="absolute inset-0 z-10 flex flex-col"
+              style={{ display: showEditor ? 'block' : 'none' }}
+            >
+              <div
+                ref={editorRef}
+                className="relative flex-grow p-2 user-select-text overflow-auto"
+              >
+                {eView && (
+                  <LanguageSelector
+                    onClickModalElement={handleChangeEditorLanguage}
+                  />
+                )}
+              </div>
+
+              <div
+                className="cursor-row-resize bg-gray-300 h-1 z-20"
+                onMouseDown={startResizing}
+                style={{ touchAction: 'none' }}
+              ></div>
+
+              <Result roomNumber={roomNumber} />
+            </div>
+
+            <div
+              className="absolute inset-0 z-10"
+              style={{ display: showEditor ? 'none' : 'block' }}
+            >
+              <Canvas roomNumber={roomNumber} />
+            </div>
+
+            <button
+              className="absolute top left-0-4 z-30 p-2 bg-blue-500 text-white rounded"
+              onClick={() => setShowEditor(!showEditor)}
+            >
+              {showEditor ? 'Show Canvas' : 'Show Editor/Result'}
+            </button>
+          </div>
+        </div>
+
+        {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
+        <div
+          onMouseDown={handleMouseDown}
+          className="cursor-col-resize"
+          style={{ width: '10px', backgroundColor: '#888' }}
+        />
+
+        <div className="flex-grow h-full flex flex-col min-w-1/4">
           <ContentContainer>
             {problem && <ProblemContent problem={problem} />}
           </ContentContainer>
-        </ProblemWrapper>
-        <ColSizeController {...handleColSizeController}></ColSizeController>
-        <SolvingWrapper>
-          <EditorWrapper ref={editorRef}>
-            < Canvas />
-          </EditorWrapper>
-
-          <EditorWrapper ref={editorRef}>
-            {eView && (
-              <LanguageSelector
-                onClickModalElement={handleChangeEditorLanguage}
-              />
-            )}
-          </EditorWrapper>
-          <RowSizeController {...handleRowSizeController}></RowSizeController>
-          <ResultWrapper>
-            <Result roomNumber={roomNumber} />
-          </ResultWrapper>
-          <ButtonsWrapper>
-            <ProblemButtons onClickClearBtn={handleClickClearButton} />
-          </ButtonsWrapper>
-        </SolvingWrapper>
+          <CompilerContainer>주민님이 만들어야 하는 부분</CompilerContainer>
+        </div>
       </MainWrapper>
     </Wrapper>
   );

@@ -16,11 +16,9 @@ const ContentWrapper = styled.div`
 const ProblemContent = ({ problem }: ProblemType) => {
   if (!problem) return <></>;
   return (
-    <>
-      <ContentWrapper>
-        <ProblemViewSection/>
-      </ContentWrapper>
-    </>
+      <div className="border-2 border-double border-gray-300 rounded-md w-full my-8 p-6 bg-[#f5fdf8] h-full">
+          <ProblemViewSection/>
+      </div>
   );
 };
 

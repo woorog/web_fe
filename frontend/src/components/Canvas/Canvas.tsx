@@ -3,21 +3,21 @@ import { useYjsStore } from './useYjsStore';
 import 'tldraw/tldraw.css';
 import './index.css';
 
-// 환경별 호스트 URL 설정 : 개발 중에는 로컬 웹소켓 서버를 사용하고,
-// 프로덕션에는 demos.yjs.dev의 웹소켓 서버를 사용합니다.
-const HOST_URL =
-	import.meta.env.MODE === 'development'
-		? 'ws://localhost:3334'
-		: 'wss://demos.yjs.dev'
+interface CanvasProps {
+	roomNumber: string;
+}
 
-// YjsExample 컴포넌트는 tldraw 편집기를 렌더링
-export default function YjsExample() {
+const HOST_URL = 'ws://localhost:3334'
+// import.meta.env.MODE === 'development'
+// 	? 'ws://localhost:3334'
+// 	: 'wss://demos.yjs.dev'
+
+export default function Canvas({ roomNumber }: CanvasProps) {
 	const store = useYjsStore({
-		roomId: 'example17',		//  특정 roomId를 사용하여 문서 공간을 구분
-		hostUrl: HOST_URL,			// 동기화를 위한 서버의 URL
-	})
+		roomId: roomNumber,
+		hostUrl: HOST_URL,
+	});
 
-	// tldraw 컴포넌트는 store를 통해 상태를 관리하고, 사용자 지정 컴포넌트를 렌더링하는 옵션을 제공
 	return (
 		<div className="tldraw__editor">
 			<Tldraw
@@ -28,8 +28,9 @@ export default function YjsExample() {
 				}}
 			/>
 		</div>
-	)
+	);
 }
+
 
 // Name 컴포넌트는 사용자의 이름과 색상을 설정할 수 있는 입력 필드를 제공
 const NameEditor = track(() => {

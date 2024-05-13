@@ -84,7 +84,7 @@ export class TestCaseController {
       { testCaseId, problemId, skip, take },
     );
 
-    if (simpleTestCaseDtoList.length > 0) {
+    if (simpleTestCaseDtoList?.length > 0) {
       return { ...simpleTestCaseDtoList };
     } else {
       throw new HttpException(

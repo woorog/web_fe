@@ -4,6 +4,7 @@ const {
     VITE_TURN_USERNAME,
     VITE_TURN_CREDENTIAL,
     VITE_SERVER_URL,
+    VITE_CHAT_SOCKET_SERVER_URL,
     MODE,
   } = import.meta.env;
   
@@ -13,6 +14,7 @@ const {
     VITE_TURN_USERNAME,
     VITE_TURN_CREDENTIAL,
     VITE_SERVER_URL,
+    VITE_CHAT_SOCKET_SERVER_URL,
     MODE,
   };
   

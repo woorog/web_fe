@@ -1,7 +1,15 @@
+import {
+  IDInputContainer,
+  InputFormContainer,
+  PasswordInputContainer,
+  AnchorLogo,
+  GreenMark,
+  TextLink,
+  InfoContainer,
+} from '../../styles/SignIn.style';
 import React, { useCallback, useMemo, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUserState } from '../../hooks/useUserState';
-import { Link } from 'react-router-dom';
 
 export const SigninInputForm = () => {
   const [isLoading, setLoading] = useState(false);
@@ -52,31 +60,29 @@ export const SigninInputForm = () => {
 
   return (
     <>
-      <div className="p-4 text-xl font-bold">
-      </div>
-      <form onSubmit={handleSubmit} className="space-y-4 text-xl font-bold">
-        <div className="flex flex-col">
-          <label htmlFor={'id'} className="text-black">아이디</label>
-          <input type={'text'} ref={id} id={'id'} className="mt-1 p-2 border rounded text-black"/>
-        </div>
-        <div className="flex flex-col">
-          <label htmlFor={'password'} className="text-black">비밀번호</label>
-          <input type={'password'} ref={password} id={'password'} className="mt-1 p-2 border rounded text-black"/>
-        </div>
+      <InfoContainer>
+        <AnchorLogo to={'/'}>
+          Signin to
+          <br />
+          OnCore
+        </AnchorLogo>
+        <TextLink to={'/signup'}>↪ Go to Signup</TextLink>
+      </InfoContainer>
+      <InputFormContainer onSubmit={handleSubmit}>
+        <IDInputContainer>
+          <label htmlFor={'id'}>아이디</label>
+          <input type={'text'} ref={id} id={'id'} />
+        </IDInputContainer>
+        <PasswordInputContainer>
+          <label htmlFor={'password'}>비밀번호</label>
+          <input type={'password'} ref={password} id={'password'} />
+        </PasswordInputContainer>
         {isLoading ? (
-          <span className="text-black">sending...</span>
+          <span>sending...</span>
         ) : (
-          <div className="flex justify-center space-x-4 mt-6">
-            <button type={'submit'} className="bg-black text-white py-3 px-6 rounded-lg hover:bg-gray-700 shadow-lg transition duration-300">
-              로그인
-            </button>
-            <Link to={'/signup'} className="bg-black text-white py-3 px-6 rounded-lg hover:bg-gray-700 shadow-lg transition duration-300">
-              회원가입
-            </Link>
-          </div>
+          <button type={'submit'}>로그인</button>
         )}
-      </form>
+      </InputFormContainer>
     </>
   );
-  
 };

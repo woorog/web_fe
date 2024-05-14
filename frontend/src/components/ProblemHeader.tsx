@@ -10,6 +10,7 @@ import { userState } from '../recoils';
 import React, { useCallback } from 'react';
 import { ReactComponent as Greater } from '../assets/Greater.svg';
 import { useUserState } from '../hooks/useUserState';
+import {PageButtons} from "./Problem/Buttons";
 
 interface propsType {
   URL: string;
@@ -37,21 +38,8 @@ export const ProblemHeader = ({ URL, problemName, type }: propsType) => {
       <div>
         <ul>
           <li>
-            <Link to="/problems"></Link>
+            <PageButtons />
           </li>
-          <li>
-            <Link to={URL}>{problemName}</Link>
-          </li>
-          {!!type && (
-            <>
-              <li>
-                <Greater className={'greater'} />
-              </li>
-              <li>
-                <Link to={URL + '/question'}>질문</Link>
-              </li>
-            </>
-          )}
         </ul>
       </div>
       <MenuContainer>

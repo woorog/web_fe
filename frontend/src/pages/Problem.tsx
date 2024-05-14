@@ -31,22 +31,14 @@ import { indentWithTab } from '@codemirror/commands';
 import * as random from 'lib0/random';
 import { useUserState } from '../hooks/useUserState';
 import Canvas from '../components/Canvas/Canvas';
+import '../../App.css';
+
 // CSS in JS
 import {
   Wrapper,
   HeaderWrapper,
   MainWrapper,
-  PageButtonsWrapper,
-  ProblemWrapper,
-  SolvingWrapper,
   VideoContainer,
-  EditorWrapper,
-  ResultWrapper,
-  ButtonsWrapper,
-  ColSizeController,
-  RowSizeController,
-  ContentContainer,
-  CompilerContainer,
 } from './ProblemStyle';
 
 const URL = import.meta.env.VITE_SERVER_URL;
@@ -95,7 +87,6 @@ const Problem = () => {
   const [language, setLanguage] = useState(code.language);
   const [text, setText] = useState(code.text);
   const [param, setParam] = useState(1);
-  // const { roomNumber } = isMultiVersion ? useParams() : { roomNumber: null };
   const [defaultCode, setDefaultCode] = useState({ ...defaultCodes });
   const problemRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
@@ -318,12 +309,12 @@ const Problem = () => {
         window.innerWidth * 0.47,
       )}px`;
   };
-  const handleMouseDown = (event) => {
+  const handleMouseDown = (event: { preventDefault: () => void; clientX: any; }) => {
     event.preventDefault();
     const startX = event.clientX;
     const startWidth = leftWidth;
 
-    const handleMouseMove = (moveEvent) => {
+    const handleMouseMove = (moveEvent: { clientX: any; }) => {
       const currentX = moveEvent.clientX;
       const dx = currentX - startX;
       const newWidth = startWidth + (dx / window.innerWidth * 100); // 창 너비에 대한 백분율로 계산
@@ -338,87 +329,102 @@ const Problem = () => {
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
   };
-
   return (
-    <Wrapper>
-      <HeaderWrapper>
-        <ProblemHeader
-          URL={
-            roomNumber
-              ? `/problem/${version}/${id}/${roomNumber}`
-              : `/problem/${version}/${id}`
-          }
-          problemName={problem?.title ? problem.title : ''}
-          type={0}
-        />
-      </HeaderWrapper>
-      <MainWrapper>
-        <PageButtonsWrapper>
-          <PageButtons />
-        </PageButtonsWrapper>
-
-        <div className="flex flex-row w-full p-4 overflow-x-hidden overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400">
-          {version === 'multi' && (
-            <VideoContainer>
-              <Video />
-            </VideoContainer>
-          )}
-          <div className="relative w-full h-full">
+      <Wrapper>
+        <HeaderWrapper>
+          <ProblemHeader
+              URL={
+                roomNumber
+                    ? `/problem/${version}/${id}/${roomNumber}`
+                    : `/problem/${version}/${id}`
+              }
+              problemName={problem?.title ? problem.title : ''}
+              type={0}
+          />
+        </HeaderWrapper>
+        <MainWrapper>
+          <div className="flex flex-row w-full p-4 overflow-x-hidden overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400">
+            {version === 'multi' && (
+                <VideoContainer>
+                  <Video />
+                </VideoContainer>
+            )}
             <div
-              className="absolute inset-0 z-10 flex flex-col"
-              style={{ display: showEditor ? 'block' : 'none' }}
+                className="relative w-full h-full"
+                style={{ display: 'flex', width: `${leftWidth}%` }}
             >
-              <div
-                ref={editorRef}
-                className="relative flex-grow p-2 user-select-text overflow-auto"
+              <button
+                  className="absolute top-0 left-1/2 transform -translate-x-1/2 mt-4 p-2 bg-white border border-gray-400 hover:bg-teal-100 focus:bg-white active:bg-white active:translate-y-1 active:shadow-inner font-medium text-center tracking-widest z-20"
+                  onClick={() => setShowEditor(!showEditor)}
               >
-                {eView && (
-                  <LanguageSelector
-                    onClickModalElement={handleChangeEditorLanguage}
-                  />
-                )}
+                {showEditor ? '캔버스' : '에디터'}
+              </button>
+              <div
+                  className="absolute inset-0 z-10 flex flex-col transition-opacity duration-1000 ease"
+                  style={{
+                    width: '100%',
+                    opacity: showEditor ? 1 : 0,
+                    visibility: showEditor ? 'visible' : 'hidden',
+                  }}
+              >
+                <div
+                    ref={editorRef}
+                    className="relative flex-grow p-2 user-select-text overflow-auto mt-2.5"
+                    style={{ flex: '0 0 60%' }} // 60% 고정
+                >
+                  {eView && (
+                      <LanguageSelector
+                          onClickModalElement={handleChangeEditorLanguage}
+                      />
+                  )}
+                </div>
+                <div
+                    className="cursor-row-resize bg-gray-300 h-1 z-20"
+                    onMouseDown={startResizing}
+                    style={{ touchAction: 'none' }}
+                ></div>
+                <div style={{ flex: '0 0 40%' }} // 40% 고정
+                >
+                  <Result roomNumber={roomNumber} />
+                </div>
               </div>
 
               <div
-                className="cursor-row-resize bg-gray-300 h-1 z-20"
-                onMouseDown={startResizing}
-                style={{ touchAction: 'none' }}
-              ></div>
-
-              <Result roomNumber={roomNumber} />
+                  className="absolute inset-0 z-10 flex flex-col transition-opacity duration-1000 ease"
+                  style={{
+                    width: '100%',
+                    opacity: showEditor ? 0 : 1,
+                    visibility: showEditor ? 'hidden' : 'visible',
+                  }}
+              >
+                <Canvas roomNumber={roomNumber} />
+              </div>
             </div>
 
             <div
-              className="absolute inset-0 z-10"
-              style={{ display: showEditor ? 'none' : 'block' }}
+                onMouseDown={handleMouseDown}
+                style={{
+                  width: '10px',
+                  backgroundColor: '#888',
+                  cursor: 'ew-resize',
+                  height: '100%',
+                }}
+            />
+
+            <div
+                className="flex-grow h-full flex flex-col min-w-1/4"
+                style={{ width: `${100 - leftWidth}%` }}
             >
-              <Canvas roomNumber={roomNumber} />
+              <div className="w-full h-5/6 overflow-auto">
+                {problem && <ProblemContent problem={problem} />}
+              </div>
+              <div className="w-full h-1/4 overflow-auto">
+                주민님이 만들어야 하는 부분
+              </div>
             </div>
-
-            <button
-              className="absolute top left-0-4 z-30 p-2 bg-blue-500 text-white rounded"
-              onClick={() => setShowEditor(!showEditor)}
-            >
-              {showEditor ? 'Show Canvas' : 'Show Editor/Result'}
-            </button>
           </div>
-        </div>
-
-        {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
-        <div
-          onMouseDown={handleMouseDown}
-          className="cursor-col-resize"
-          style={{ width: '10px', backgroundColor: '#888' }}
-        />
-
-        <div className="flex-grow h-full flex flex-col min-w-1/4">
-          <ContentContainer>
-            {problem && <ProblemContent problem={problem} />}
-          </ContentContainer>
-          <CompilerContainer>주민님이 만들어야 하는 부분</CompilerContainer>
-        </div>
-      </MainWrapper>
-    </Wrapper>
+        </MainWrapper>
+      </Wrapper>
   );
 };
 

@@ -106,88 +106,89 @@ const texts: Text[] = [
 ]
 
 const Problem = ({ problemId }: ProblemProps) => {
-const navigate = useNavigate();
-const [roomUrl, setRoomUrl] = useState('');
-const [currentIndex, setCurrentIndex] = useState(0);
-const [opacity, setOpacity] = useState('opacity-100');
-
-
-useEffect(() => {
-    const intervalId = setInterval(() => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % texts.length);
-    }, 2000);
-
-    return () => clearInterval(intervalId);
-}, []);
-
-const handleCreateRoom = () => {
-    const room = btoa(uuid());
-    localStorage.setItem(`problem${problemId}`, room);
-    navigate(`/problem/multi/${problemId}/${room}`);
-};
-
-const handleJoinRoom = () => {
-    if (roomUrl) {
+    const navigate = useNavigate();
+    const [roomUrl, setRoomUrl] = useState('');
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [fade, setFade] = useState('opacity-100 translate-y-0');
+  
+    useEffect(() => {
+      const intervalId = setInterval(() => {
+        setFade('opacity-0 -translate-y-5');
+        setTimeout(() => {
+          setCurrentIndex((prevIndex) => (prevIndex + 1) % texts.length);
+          setFade('opacity-100 translate-y-0');
+        }, 1000);
+      }, 3000);
+  
+      return () => clearInterval(intervalId);
+    }, []);
+  
+    const handleCreateRoom = () => {
+      const room = btoa(uuid());
+      localStorage.setItem(`problem${problemId}`, room);
+      navigate(`/problem/multi/${problemId}/${room}`);
+    };
+  
+    const handleJoinRoom = () => {
+      if (roomUrl) {
         if (/^https?:\/\//.test(roomUrl)) {
-            window.location.href = roomUrl;
+          window.location.href = roomUrl;
         } else {
-            navigate(roomUrl);
+          navigate(roomUrl);
         }
-    } else {
-        alert("Please enter a valid room URL");
-    }
-};
-
-// texts 배열의 현재 인덱스에 해당하는 텍스트를 가져오고, 조건에 따라 가공하는 함수를 정의합니다.
-const getCurrentText = (text : Text) => {
-    // 한국어 텍스트를 기준으로 글자 수가 7글자를 초과하면 첫 번째 공백에서 줄바꿈을 합니다.
-    if (text.kr.length > 9) {
-        const firstSpaceIndex = text.kr.indexOf(' ',7);
+      } else {
+        alert('Please enter a valid room URL');
+      }
+    };
+  
+    const getCurrentText = (text: Text) => {
+      if (text.kr.length > 9) {
+        const firstSpaceIndex = text.kr.indexOf(' ', 7);
         if (firstSpaceIndex !== -1) {
-            return {
-                ...text,
-                kr: text.kr.substring(0, firstSpaceIndex) + '\n' + text.kr.substring(firstSpaceIndex + 1)
-            };
+          return {
+            ...text,
+            kr: text.kr.substring(0, firstSpaceIndex) + '\n' + text.kr.substring(firstSpaceIndex + 1),
+          };
         }
-    }
-    return text;
-};
-
-return (
-    <div className="flex flex-col items-center justify-center h-screen p-5 bg-black">
-        <div className={`${opacity} transition-opacity duration-1000 mb-40`}>
-            {
-                // 현재 텍스트 객체를 getCurrentText 함수를 통해 가공한 후 렌더링합니다.
-                // '\n'을 기준으로 줄바꿈을 처리하기 위해 split과 map을 사용합니다.
-                getCurrentText(texts[currentIndex]).kr.split('\n').map((line, index) => (
-                    <p key={index} className="text-8xl text-white">
-                        {line}
-                    </p>
-                ))
-            }
+      }
+      return text;
+    };
+  
+    return (
+      <div className="flex flex-col items-center justify-center h-screen p-5 bg-black">
+        <div className="flex flex-col items-center justify-center h-1/5 mb-40">
+          <div className={`${fade} transition-opacity transition-transform duration-1000`}>
+            {getCurrentText(texts[currentIndex]).kr.split('\n').map((line, index) => (
+              <p key={index} className="text-8xl text-white">
+                {line}
+              </p>
+            ))}
             <p className="text-4xl text-gray-500">{texts[currentIndex].en}</p>
+          </div>
         </div>
-        <input
+        <div className="flex flex-col items-center w-full">
+          <input
             type="text"
             placeholder="방 URL을 입력해 참가하세요"
             value={roomUrl}
             onChange={(e) => setRoomUrl(e.target.value)}
             className="w-7/12 h-12 p-2 mb-5 text-lg border-2 border-gray-300 rounded-lg focus:border-blue-500 text-black bg-white"
-        />
-        <button
+          />
+          <button
             onClick={handleJoinRoom}
             className="w-5/12 h-12 mb-5 text-black bg-white rounded-lg text-xl font-bold hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50"
-        >
+          >
             방 참가하기
-        </button>
-        <button
+          </button>
+          <button
             onClick={handleCreateRoom}
             className="w-5/12 h-12 mb-5 text-black bg-white rounded-lg text-xl font-bold hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50"
-        >
+          >
             방 만들기
-        </button>
-    </div>
-);
-};
-
-export default memo(Problem);
+          </button>
+        </div>
+      </div>
+    );
+  };
+  
+  export default memo(Problem);

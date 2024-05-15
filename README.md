@@ -71,7 +71,7 @@ cd frontend
 npx y-webrtc
 
 cd socket
-yarn dev
+yarn start
 
 cd chat
 yarn start

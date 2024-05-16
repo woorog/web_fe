@@ -1,5 +1,3 @@
-
-
 import { Route, Routes, BrowserRouter, Navigate } from 'react-router-dom';
 import { Home, ProblemList, Problem, Profile, Sign } from './pages';
 import { useUserState } from './hooks/useUserState';
@@ -29,9 +27,12 @@ const App = () => {
               element={<Problem />}
             />
           ) : (
-              <Route path="/problem/:version/:id/:roomNumber" element={<Sign />} />
-                  )}
-                  {isLoggedIn && <Route path="/profile" element={<Profile />} />}
+            <Route
+              path="/problem/:version/:id/:roomNumber"
+              element={<Sign />}
+            />
+          )}
+          {isLoggedIn && <Route path="/profile" element={<Profile />} />}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </BrowserRouter>

@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 export const Wrapper = styled.div`
   width: 100%;
@@ -63,37 +63,6 @@ export const ProblemWrapper = styled.div`
   }
 `;
 
-// const ProblemWrapper = styled.div`
-//   width: 50%;
-//   min-width: 15%;
-//   height: auto;
-//   padding: 1rem;
-//   position: relative;
-//
-//   word-break: break-all;
-//   overflow-x: hidden;
-//   overflow-y: scroll;
-//
-//   ::-webkit-scrollbar {
-//     width: 20px;
-//   }
-//
-//   ::-webkit-scrollbar-track {
-//     background-color: transparent;
-//   }
-//
-//   ::-webkit-scrollbar-thumb {
-//     background-color: #d6dee1;
-//     border-radius: 20px;
-//     border: 6px solid transparent;
-//     background-clip: content-box;
-//   }
-//
-//   ::-webkit-scrollbar-thumb:hover {
-//     background-color: #a8bbbf;
-//   }
-// `;
-
 export const SolvingWrapper = styled.div`
   flex-grow: 1;
   height: 100%;
@@ -108,28 +77,26 @@ export const VideoContainer = styled.div`
 `;
 
 export const ContentContainer = styled.div`
-    width: 100%; // Allocate 30% width for the video
-    height: 85%; // Match the height of the ProblemWrapper
+  width: 100%; // Allocate 30% width for the video
+  height: 85%; // Match the height of the ProblemWrapper
 `;
 
 export const CompilerContainer = styled.div`
-    width: 100%; // Allocate 30% width for the video
-    height: 25%; // Match the height of the ProblemWrapper
+  width: 100%; // Allocate 30% width for the video
+  height: 25%; // Match the height of the ProblemWrapper
 `;
 
-
 export const EditorWrapper = styled.div`
-    width: 100%;  // 부모 컨테이너의 너비에 맞춤
-    height: calc(100% - 2rem);  // 부모의 높이에서 2rem 만큼 빼고 사용
-    min-height: 10%;  // 최소 높이 설정
-    padding: 0.8rem;
-    position: relative;
-    -webkit-user-select: text;
-    -moz-user-select: text;
-    -ms-user-select: text;
-    user-select: text;
-    overflow: auto;
-    
+  width: 100%; // 부모 컨테이너의 너비에 맞춤
+  height: calc(100% - 2rem); // 부모의 높이에서 2rem 만큼 빼고 사용
+  min-height: 10%; // 최소 높이 설정
+  padding: 0.8rem;
+  position: relative;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+  overflow: auto;
 `;
 
 export const ResultWrapper = styled.div`

@@ -1,4 +1,4 @@
-import { ErrorData } from "./ChatTypes";
+import { ErrorData } from './ChatTypes';
 
 interface ChatErrorToastProps {
   errorData: ErrorData;

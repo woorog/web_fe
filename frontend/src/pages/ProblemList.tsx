@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
 import { useRecoilState } from 'recoil';
 import { MainHeader } from '../components/MainHeader';
 import { SearchFilter, List } from '../components/ProblemList';
@@ -9,36 +8,6 @@ import { ProblemInfo } from '@types';
 import { userState } from '../recoils';
 
 const URL = import.meta.env.VITE_SERVER_URL;
-
-const MainWrapper = styled.div`
-  width: 100%;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 80rem;
-  min-height: 123rem;
-  height: 123rem;
-`;
-
-const HeaderWrapper = styled.div`
-  min-width: 80rem;
-  width: 80rem;
-  min-height: 8rem;
-  height: 8rem;
-`;
-
-const ListWrapper = styled.div`
-  width: 100%;
-  height: 90rem;
-  background: #f1f5ee;
-  display: flex;
-`;
-
-const FooterWrapper = styled.div`
-  width: 100%;
-  height: 20rem;
-`;
 
 const ProblemList = () => {
   const [filter, setFilter] = useRecoilState(filterState);
@@ -84,18 +53,18 @@ const ProblemList = () => {
   }, [filter, list]);
 
   return (
-    <MainWrapper>
-      <HeaderWrapper>
+    <div className="flex flex-col items-center w-full min-w-[100rem] min-h-[100rem] bg-black text-white">
+      <div className="w-full min-h-[8rem] h-[8rem] min-w-[100rem]">
         <MainHeader />
-      </HeaderWrapper>
+      </div>
       <SearchFilter />
-      <ListWrapper>
+      <div className="flex w-full h-[60rem]">
         <List list={filtered} />
-      </ListWrapper>
-      <FooterWrapper>
+      </div>
+      <div className="w-full ">
         <Footer />
-      </FooterWrapper>
-    </MainWrapper>
+      </div>
+    </div>
   );
 };
 

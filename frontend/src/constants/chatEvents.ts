@@ -11,11 +11,13 @@ export const CHATTING_SOCKET_RECIEVE_EVENT = {
     MESSAGE_ERROR_CODE: 400,
     SERVER_ERROR_CODE: 500,
     AI_ERROR_CODE: 429,
+    EXEC_ERROR_CODE: 439,
   };
   
   export const CHATTING_ERROR_TEXT = {
     MESSAGE_ERROR_TEXT: { text1: 'Something went wrong', text2: '' },
     SERVER_ERROR_TEXT: { text1: 'Servers are down', text2: '' },
     AI_ERROR_TEXT: { text1: 'Someone else is using AI', text2: '' },
+    EXEC_ERROR_TEXT: { text1: 'Someone else is Executing the Code', text2: '' },
   };
   

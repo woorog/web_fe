@@ -1,35 +1,30 @@
-import { useParams } from 'react-router-dom';
 import { memo, useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
 import { ErrorData, ErrorResponse, MessageData } from './ChatComponents/ChatTypes';
-import ChattingMessage from './ChatComponents/ChattingMessage'
+import ChattingMessage from './ChatComponents/ChattingMessage';
 import ChattingInput from './ChatComponents/ChattingInput';
 import ScrollDownButton from './ChatComponents/ScrollDownButton';
 import ChatSection from './ChatComponents/ChatSection';
 import ChatErrorToast from './ChatComponents/ChatErrorToast';
 import createSocket from './ChatComponents/CreateChatSocket';
-import { CHATTING_SOCKET_EMIT_EVENT, CHATTING_SOCKET_RECIEVE_EVENT } from '../../constants/chatEvents';
 import { CHATTING_ERROR_TEXT, CHATTING_ERROR_STATUS_CODE } from '../../constants/chatEvents';
 import useLastMessageViewingState from '../../hooks/useLastMessageViewingState';
 import useScroll from '../../hooks/useScroll';
 import { VITE_CHAT_SOCKET_SERVER_URL } from '../../constants/env';
 
-// new
 interface ChattingSectionProps {
   roomNumber: string;
 }
 
-// new
-// function ChattingSection()
 const ChattingSection: React.FC<ChattingSectionProps> = ({ roomNumber }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [allMessages, setAllMessage] = useState<MessageData[]>([]);
 
-  const [usingAi, setUsingAi] = useState<boolean>(false);
+  const [messageType, setMessageType] = useState<'human' | 'ai' | 'exec'>('human');
   const [postingAi, setPostingAi] = useState<boolean>(false);
+  const [postingExec, setPostingExec] = useState<boolean>(false);
 
   const [errorData, setErrorData] = useState<ErrorData | null>(null);
-  // const { roomId } = useParams();
 
   const { ref: messageAreaRef, scrollRatio, handleScroll, moveToBottom } = useScroll<HTMLDivElement>();
   const { isViewingLastMessage, isRecievedMessage, setIsRecievedMessage } = useLastMessageViewingState(scrollRatio);
@@ -44,18 +39,23 @@ const ChattingSection: React.FC<ChattingSectionProps> = ({ roomNumber }) => {
 
     if (recievedMessage.ai) setPostingAi(false);
 
+    if ('exec' in recievedMessage && recievedMessage.exec) {
+      setPostingExec(false); // Stop the spinner for exec messages
+    }
+
     setAllMessage((prev) => [...prev, recievedMessage]);
   };
 
   const handleChattingSocketError = (errorMessage: ErrorResponse) => {
     const { statusCode } = errorMessage;
 
-    const { MESSAGE_ERROR_CODE, SERVER_ERROR_CODE, AI_ERROR_CODE } = CHATTING_ERROR_STATUS_CODE;
-    const { MESSAGE_ERROR_TEXT, SERVER_ERROR_TEXT, AI_ERROR_TEXT } = CHATTING_ERROR_TEXT;
+    const { MESSAGE_ERROR_CODE, SERVER_ERROR_CODE, AI_ERROR_CODE, EXEC_ERROR_CODE } = CHATTING_ERROR_STATUS_CODE;
+    const { MESSAGE_ERROR_TEXT, SERVER_ERROR_TEXT, AI_ERROR_TEXT, EXEC_ERROR_TEXT } = CHATTING_ERROR_TEXT;
 
     if (statusCode === MESSAGE_ERROR_CODE) setErrorData(MESSAGE_ERROR_TEXT);
     if (statusCode === SERVER_ERROR_CODE) setErrorData(SERVER_ERROR_TEXT);
     if (statusCode === AI_ERROR_CODE) setErrorData(AI_ERROR_TEXT);
+    if (statusCode === EXEC_ERROR_CODE) setErrorData(EXEC_ERROR_TEXT);
   };
 
   const socketConnect = async () => {
@@ -64,12 +64,12 @@ const ChattingSection: React.FC<ChattingSectionProps> = ({ roomNumber }) => {
       'new_message': handleRecieveMessage,
       exception: handleChattingSocketError,
     };
-  
+
     const newSocket = createSocket(socketURL, socketCallbacks);
     newSocket.connect();
-    // newSocket.emit('join_room', { room: roomId });
+
     newSocket.emit('join_room', { room: roomNumber });
-  
+
     setSocket(newSocket);
   };
 
@@ -97,11 +97,13 @@ const ChattingSection: React.FC<ChattingSectionProps> = ({ roomNumber }) => {
         {isRecievedMessage && <ScrollDownButton handleMoveToBottom={moveToBottom} />}
         {errorData && <ChatErrorToast errorData={errorData} setErrorData={setErrorData} />}
         <ChattingInput
-          usingAi={usingAi}
-          setUsingAi={setUsingAi}
+          messageType={messageType}
+          setMessageType={setMessageType}
           postingAi={postingAi}
-          socket={socket}
           setPostingAi={setPostingAi}
+          postingExec={postingExec}
+          setPostingExec={setPostingExec}
+          socket={socket}
           moveToBottom={moveToBottom}
           roomNumber={roomNumber}
         />

@@ -1,14 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import {
-  AnchorLogo,
-  ButtonContainer,
-  CheckButton,
-  GreenMark,
-  IDInputContainer,
-  InputFormContainer,
-  LightContainer,
-  PasswordInputContainer,
-} from '../../styles/SignUp.style';
 import useInput from '../../hooks/useInput';
 import { useNavigate } from 'react-router-dom';
 
@@ -74,12 +64,13 @@ export const SignupInputForm = () => {
     setIdCheck(false);
   };
 
-  const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!isIdRight || !idCheck) alert('아이디를 확인해해주세요');
-    else if (!isPwRight) alert('비밀번호를 다시 입력해주세요');
-    else {
-      //useFetch
+    if (!isIdRight || !idCheck) {
+      alert('아이디를 확인해 주세요');
+    } else if (!isPwRight) {
+      alert('비밀번호를 다시 입력해 주세요');
+    } else {
       fetch(`${URL}/users`, {
         method: 'POST',
         headers: {
@@ -102,8 +93,9 @@ export const SignupInputForm = () => {
         });
     }
   };
+
   const handleIdCheck = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (!idValid(id.value)) alert('올바른 아이디를 입력해주세요');
+    if (!idValid(id.value)) alert('올바른 아이디를 입력해 주세요');
     else {
       fetch(`${URL}/users?loginId=${id.value}`)
         .then((res) => res.json())
@@ -117,71 +109,84 @@ export const SignupInputForm = () => {
             if (pwRef.current) pwRef.current.focus();
           }
         })
-        .catch((err) => {
+        .catch(() => {
           alert('아이디를 사용하실 수 없습니다');
           setIdCheck(false);
           setIdRight(false);
         });
     }
   };
+
   return (
-    <>
-      <AnchorLogo to={'/'}>
-        Signup for
-        <br />
-        On<GreenMark>Core</GreenMark>
-      </AnchorLogo>
-      <InputFormContainer>
-        <IDInputContainer>
-          <p>아이디</p>
+    <div className="flex flex-col items-center justify-center w-full max-w-4xl px-8 py-10 bg-white shadow-lg rounded-xl">
+      <form onSubmit={handleSubmit} className="w-full mt-8 space-y-6 text-xl font-bold">
+        <div className="flex flex-col">
+          <label htmlFor="id" className="text-black">아이디</label>
+          <div className="flex items-center">
+            <input
+              type="text"
+              placeholder="6자 이상"
+              {...id}
+              ref={idRef}
+              onKeyPress={(e) => handleKeyPress(e, pwRef)}
+              className="mt-1 p-2 border rounded text-black flex-grow"
+            />
+            <button
+              type="button"
+              className="ml-2 px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-400 transition duration-300 text-xl"
+              onClick={handleIdCheck}
+            >
+              중복 확인
+            </button>
+          </div>
+          {id.value && !isIdRight && (
+            <div className="mt-2">
+              <span className="text-red-500">사용 불가능한 아이디입니다</span>
+            </div>
+          )}
+        </div>
+        <div className="flex flex-col">
+          <label htmlFor="password" className="text-black">비밀번호</label>
           <input
-            type={'text'}
-            placeholder={'영어/숫자 6자 이상'}
-            {...id}
-            ref={idRef}
-            onKeyPress={(e) => {
-              handleKeyPress(e, pwRef);
-            }}
-          />
-          <LightContainer style={{ marginRight: '8rem' }}>
-            {isIdRight ? '🔴' : '🟢'}
-          </LightContainer>
-          <CheckButton type={'button'} onClick={handleIdCheck}>
-            중복확인
-          </CheckButton>
-        </IDInputContainer>
-        <PasswordInputContainer>
-          <p>비밀번호</p>
-          <input
-            type={'password'}
-            placeholder={'영어/숫자/특수문자 8자 이상'}
+            type="password"
+            placeholder="특수문자 포함 8자 이상"
             {...pw}
             ref={pwRef}
-            onKeyPress={(e) => {
-              handleKeyPress(e, pwCheckRef);
-            }}
+            onKeyPress={(e) => handleKeyPress(e, pwCheckRef)}
+            className="mt-1 p-2 border rounded text-black"
           />
-          <LightContainer>{isPwRight ? '🔴' : '🟢'}</LightContainer>
-        </PasswordInputContainer>
-        <PasswordInputContainer>
-          <p>비밀번호 확인</p>
+        </div>
+        <div className="flex flex-col">
+          <label htmlFor="confirmPassword" className="text-black">비밀번호 확인</label>
           <input
-            type={'password'}
-            placeholder={'영어/숫자/특수문자 8자 이상'}
+            type="password"
+            placeholder="비밀번호를 다시 입력해 주세요"
             {...pwCheck}
             ref={pwCheckRef}
+            className="mt-1 p-2 border rounded text-black"
           />
-          <LightContainer>{isPwRight ? '🔴' : '🟢'}</LightContainer>
-        </PasswordInputContainer>
-        <ButtonContainer>
-          <button type={'reset'} onClick={handleClear}>
+          {pwCheck.value && !isPwRight && (
+            <div className="mt-2">
+              <span className="text-red-500">비밀번호가 일치하지 않습니다</span>
+            </div>
+          )}
+        </div>
+        <div className="flex justify-between mt-4">
+          <button
+            type="reset"
+            className="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition duration-300 text-xl"
+            onClick={handleClear}
+          >
             초기화
           </button>
-          <button type={'submit'} onClick={handleSubmit}>
+          <button
+            type="submit"
+            className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-500 transition duration-300 text-xl"
+          >
             회원가입
           </button>
-        </ButtonContainer>
-      </InputFormContainer>
-    </>
+        </div>
+      </form>
+    </div>
   );
 };

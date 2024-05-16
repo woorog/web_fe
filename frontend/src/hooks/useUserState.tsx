@@ -9,7 +9,7 @@ import { useRecoilState } from 'recoil';
 import { userState } from '../recoils';
 
 let logoutTimer: any;
-
+// const URL = import.meta.env.VITE_SERVER_URL;
 export const useUserState = () => {
   const [user, setUser] = useRecoilState(userState);
   const { token, camperID, expirationTime } = getLocalToken();
@@ -32,10 +32,13 @@ export const useUserState = () => {
     (token: string, expirationTime: string, camperID: string) => {
       const remainingTime =
         expirationTime === null ? 0 : calculateRemainingTime(expirationTime);
+      // @ts-ignore
       setLocalToken(token, expirationTime, camperID);
       setUser({
+        // @ts-ignore
         token,
         isLoggedIn: true,
+        // @ts-ignore
         ID: camperID,
       });
       logoutTimer = setTimeout(logoutHandler, remainingTime);
@@ -57,6 +60,25 @@ export const useUserState = () => {
     }
     loginHandler(token, expirationTime, camperID);
   }, []);
+
+  // useEffect(() => {
+  //   if (!user.isLoggedIn || !user.ID || !user.token) {
+  //     return;
+  //   }
+  //   fetch(`${URL}/auth/jwtLogin`, {
+  //     method: 'POST',
+  //     headers: {
+  //       Authorization: 'Bearer ' + user.token,
+  //     },
+  //   })
+  //     .then((res) => res.json())
+  //     .then((res) => {
+  //       if (res.userId === user.ID) {
+  //         return;
+  //       }
+  //       logoutHandler();
+  //     });
+  // }, []);
 
   return {
     user,

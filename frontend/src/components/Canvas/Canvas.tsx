@@ -1,4 +1,5 @@
 import { Tldraw, track, useEditor } from 'tldraw';
+import { VITE_SOCKET_CANVAS_URL } from '../../constants/env';
 import { useYjsStore } from './useYjsStore';
 import 'tldraw/tldraw.css';
 import './index.css';
@@ -7,10 +8,7 @@ interface CanvasProps {
 	roomNumber: string;
 }
 
-const HOST_URL = 'ws://localhost:3334'
-// import.meta.env.MODE === 'development'
-// 	? 'ws://localhost:3334'
-// 	: 'wss://demos.yjs.dev'
+const HOST_URL = VITE_SOCKET_CANVAS_URL;
 
 export default function Canvas({ roomNumber }: CanvasProps) {
 	const store = useYjsStore({
@@ -31,16 +29,10 @@ export default function Canvas({ roomNumber }: CanvasProps) {
 	);
 }
 
-
-// Name 컴포넌트는 사용자의 이름과 색상을 설정할 수 있는 입력 필드를 제공
 const NameEditor = track(() => {
-	// tldraw의 편집기 훅을 사용하여 편집기 인스턴스를 가져옴
-	const editor = useEditor()	
-
-	// 현재 사용자의 선호도를 가져옴
+	const editor = useEditor()
 	const { color, name } = editor.user.getUserPreferences()
 
-	// 입력 필드를 통해 사용자 선호도를 업데이트함
 	return (
 		<div style={{ pointerEvents: 'all', display: 'flex' }}>
 			<input

@@ -11,7 +11,7 @@ function SendButtonText({ usingAi, postingAi }: { usingAi: boolean; postingAi: b
   if (!usingAi) return 'Send';
   if (postingAi) return <Spinner />;
 
-  return 'Send AI';
+  return 'Ask AI';
 }
 
 interface ChattingInputProps {
@@ -63,7 +63,7 @@ export default function ChattingInput({ usingAi, setUsingAi, postingAi, setPosti
           value={message}
           onChange={onChange}
           className={`w-full h-full p-2 px-4 focus:outline-none rounded-s-lg resize-none border-2 custom-scroll ${
-            usingAi ? 'border-point-blue' : 'border-white'
+            usingAi ? 'border-point-blue' : 'border-point-blue'
           }`}
           placeholder={usingAi ? 'Ask AI for insight' : 'Message to Peer'}
         />
@@ -71,7 +71,7 @@ export default function ChattingInput({ usingAi, setUsingAi, postingAi, setPosti
           type="button"
           onClick={handleMessageSend}
           className={`font-normal rounded-e-lg whitespace-nowrap w-16 flex items-center justify-center h-full ${
-            usingAi ? 'bg-point-blue text-white' : 'bg-primary text-black'
+            usingAi ? 'bg-lime-500 text-black' : 'bg-blue-300 text-black'
           }`}
           disabled={usingAi && postingAi}
         >

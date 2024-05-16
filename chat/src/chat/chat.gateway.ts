@@ -12,7 +12,7 @@ import * as os from 'os';
 import axios from 'axios';
 import Redis from 'ioredis';
 
-@WebSocketGateway({ namespace: SOCKET.NAME_SPACE, cors: true })
+@WebSocketGateway({ cors: true })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;

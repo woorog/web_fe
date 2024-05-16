@@ -6,15 +6,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { socketState } from '../../recoils';
 
-// const VideoContainer = styled.div`
-//   margin-top: 1rem;
-//   width: 100%;
-//   height: 9rem;
-//   display: flex;
-//   justify-content: right;
-//   align-items: center;
-// `;
-
 const VideoContainer = styled.div`
   margin-top: 1rem;
   width: 100%;
@@ -48,27 +39,6 @@ const DivWrapper = styled.div`
     width: 100%;
   }
 `;
-
-// const UserVideoContainer = styled.video`
-//   max-width: 16rem;
-//   width: 33%;
-//   max-height: 9rem;
-//   height: auto;
-//   margin-right: 2px;
-// `;
-//
-// const DivWrapper = styled.div`
-//   position: relative;
-//   max-height: 9rem;
-//   max-width: 16rem;
-//   width: 33%;
-//   height: auto;
-//
-//   video {
-//     width: 100%;
-//     margin-right: 0;
-//   }
-// `;
 
 const ButtonContainer = styled.div`
   position: absolute;
@@ -133,16 +103,25 @@ export const Video = () => {
   const [socket, setSocket] = useRecoilState(socketState);
 
   useEffect(() => {
-    navigator.mediaDevices.getUserMedia(Constraints).then((mediaStream) => {
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((mediaStream) => {
       setVideoOn(true);
       setMicOn(true);
       setMyStream(mediaStream);
       setMyPeer(new Peer());
-      setSocket(
-        io(import.meta.env.VITE_SOCKET_SERVER_URL, {
-          secure: process.env.NODE_ENV !== 'development',
-        }),
-      );
+
+      const socketUrl = import.meta.env.VITE_SOCKET_SERVER_URL;
+
+      const newSocket = io(socketUrl, {
+        path: '/socket-video/',
+        secure: true,
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+      });
+
+      setSocket(newSocket);
+    }).catch((error) => {
+      console.error('Error accessing media devices:', error);
     });
   }, []);
 
@@ -164,7 +143,6 @@ export const Video = () => {
     [myStream, peers],
   );
 
-  //기존 접속한 peer 여기로
   const connectCallback = useCallback(
     (userId: string) => {
       if (!myStream || !myPeer) {
@@ -240,7 +218,6 @@ export const Video = () => {
     });
   }, [myPeer, socket]);
 
-  //video remoteStream
   useEffect(() => {
     Object.values(peers).forEach((call, idx) => {
       // @ts-ignore

@@ -1,4 +1,3 @@
-import { useParams } from 'react-router-dom';
 import { memo, useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
 import { ErrorData, ErrorResponse, MessageData } from './ChatComponents/ChatTypes';
@@ -8,19 +7,15 @@ import ScrollDownButton from './ChatComponents/ScrollDownButton';
 import ChatSection from './ChatComponents/ChatSection';
 import ChatErrorToast from './ChatComponents/ChatErrorToast';
 import createSocket from './ChatComponents/CreateChatSocket';
-import { CHATTING_SOCKET_EMIT_EVENT, CHATTING_SOCKET_RECIEVE_EVENT } from '../../constants/chatEvents';
 import { CHATTING_ERROR_TEXT, CHATTING_ERROR_STATUS_CODE } from '../../constants/chatEvents';
 import useLastMessageViewingState from '../../hooks/useLastMessageViewingState';
 import useScroll from '../../hooks/useScroll';
 import { VITE_CHAT_SOCKET_SERVER_URL } from '../../constants/env';
 
-// new
 interface ChattingSectionProps {
   roomNumber: string;
 }
 
-// new
-// function ChattingSection()
 const ChattingSection: React.FC<ChattingSectionProps> = ({ roomNumber }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [allMessages, setAllMessage] = useState<MessageData[]>([]);
@@ -29,7 +24,6 @@ const ChattingSection: React.FC<ChattingSectionProps> = ({ roomNumber }) => {
   const [postingAi, setPostingAi] = useState<boolean>(false);
 
   const [errorData, setErrorData] = useState<ErrorData | null>(null);
-  // const { roomId } = useParams();
 
   const { ref: messageAreaRef, scrollRatio, handleScroll, moveToBottom } = useScroll<HTMLDivElement>();
   const { isViewingLastMessage, isRecievedMessage, setIsRecievedMessage } = useLastMessageViewingState(scrollRatio);
@@ -67,12 +61,11 @@ const ChattingSection: React.FC<ChattingSectionProps> = ({ roomNumber }) => {
   
     const newSocket = createSocket(socketURL, socketCallbacks);
     newSocket.connect();
-    // newSocket.emit('join_room', { room: roomId });
+    
     newSocket.emit('join_room', { room: roomNumber });
   
     setSocket(newSocket);
   };
-
   useEffect(() => {
     socketConnect();
   }, []);

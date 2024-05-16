@@ -1,5 +1,14 @@
 import { ConfigService } from '@nestjs/config';
-import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException } from '@nestjs/websockets';
+import {
+  ConnectedSocket,
+  MessageBody,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
+  WsException,
+} from '@nestjs/websockets';
 import { Logger } from '@nestjs/common';
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import { Server, Socket } from 'socket.io';
@@ -8,6 +17,7 @@ import { LeaveRoomDto } from './dto/leave-room.dto';
 import { MessageDto } from './dto/message.dto';
 import { ERRORS, SOCKET, SOCKET_EVENT } from '../commons/utils';
 import { ChatService } from './chat.service';
+import { CodeExecuteService } from '../execute/execute.service';
 import * as os from 'os';
 import axios from 'axios';
 import Redis from 'ioredis';
@@ -27,6 +37,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @InjectRedis() private readonly client: Redis,
     private readonly chatService: ChatService,
     private readonly configService: ConfigService,
+    ///
+    private readonly codeExecuteService: CodeExecuteService,
   ) {
     this.subscriberClient = client.duplicate();
     this.publisherClient = client.duplicate();
@@ -96,19 +108,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.logger.log(`Instance ${this.instanceId} - sendMessage: ${socket.id}`);
 
     this.chatService.validateSendMessage(data);
-
-    const { room, message, nickname, ai } = data;
+    ///
+    const { room, message, nickname, ai, execOutput, execId } = data;
 
     this.logger.log(`Instance ${this.instanceId} - message: ${data.message}`);
 
+    this.logger.log('Starting message handling logic.');
+
+    ////
     const response = {
       room: room,
       message: message,
       nickname: nickname,
       socketId: socket.id,
       ai: ai,
+      execOutput: execOutput,
     };
-
     if (ai) {
       try {
         await this.publisherClient.publish(
@@ -131,6 +146,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         });
       }
     }
+    ///
+    if (execOutput) {
+      this.logger.log(`Executing code with execId: ${execId}`);
+      try {
+        const execResult = await this.useExecute(execId);
+        response.execOutput = execResult;
+        this.logger.log(`Execution result: ${JSON.stringify(execResult)}`);
+      } catch (error) {
+        this.logger.error('Failed to retrieve execution result:', error);
+        throw new WsException('Execution result retrieval failed');
+      }
+    }
 
     try {
       await this.publisherClient.publish(
@@ -142,6 +169,23 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         statusCode: ERRORS.FAILED_PUBLISHING.statusCode,
         message: ERRORS.FAILED_PUBLISHING.message,
       });
+    }
+
+    this.logger.log('Finished message handling logic.');
+  }
+
+  ///////
+  private async useExecute(execId: string) {
+    this.logger.log(`Fetching execution result for execId: ${execId}`);
+    try {
+      const execResult = await this.codeExecuteService.getStoredResult(execId);
+      this.logger.log(
+        `Fetched execution result: ${JSON.stringify(execResult)}`,
+      );
+      return execResult;
+    } catch (error) {
+      this.logger.error(`Execution result retrieval failed: ${error.message}`);
+      throw new WsException('Execution result retrieval failed');
     }
   }
 
@@ -184,9 +228,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     };
 
     try {
-      this.logger.log(`Sending AI request for room ${room}, message ${message}`);
+      this.logger.log(
+        `Sending AI request for room ${room}, message ${message}`,
+      );
       const response = await axios.post(url, data, { headers });
-      this.logger.log(`AI response for ${socketId}: ${JSON.stringify(response.data)}`);
+      this.logger.log(
+        `AI response for ${socketId}: ${JSON.stringify(response.data)}`,
+      );
       return response.data;
     } catch (error) {
       this.logger.error(`AI request failed for ${socketId}: ${error.message}`);
@@ -194,33 +242,39 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  async processAIResponse(room: string, message: string, socketId: string): Promise<LLMMessageDto> {
+  async processAIResponse(
+    room: string,
+    message: string,
+    socketId: string,
+  ): Promise<LLMMessageDto> {
     try {
-        const response = await this.useLLM(room, message, socketId);
-        this.logger.log(`Processing AI llmStream: ${JSON.stringify(response)}`);
-        
-        const result = response.result;
-        if (!result || !result.message) {
-            throw new Error('Invalid AI response structure.');
-        }
+      const response = await this.useLLM(room, message, socketId);
+      this.logger.log(`Processing AI llmStream: ${JSON.stringify(response)}`);
 
-        const { role, content } = result.message;
-        if (!role || !content) {
-            throw new Error('Missing role or content in AI message.');
-        }
+      const result = response.result;
+      if (!result || !result.message) {
+        throw new Error('Invalid AI response structure.');
+      }
 
-        this.logger.log(`Extracted message from AI: role = ${role}, content = ${content}`);
+      const { role, content } = result.message;
+      if (!role || !content) {
+        throw new Error('Missing role or content in AI message.');
+      }
 
-        return {
-            role: role,
-            content: content
-        };
+      this.logger.log(
+        `Extracted message from AI: role = ${role}, content = ${content}`,
+      );
+
+      return {
+        role: role,
+        content: content,
+      };
     } catch (error) {
-        this.logger.error(`Error processing AI response: ${error.message}`);
-        throw new WsException({
-            statusCode: ERRORS.FAILED_ACCESS_LLM.statusCode,
-            message: ERRORS.FAILED_ACCESS_LLM.message,
-        });
+      this.logger.error(`Error processing AI response: ${error.message}`);
+      throw new WsException({
+        statusCode: ERRORS.FAILED_ACCESS_LLM.statusCode,
+        message: ERRORS.FAILED_ACCESS_LLM.message,
+      });
     }
   }
 }

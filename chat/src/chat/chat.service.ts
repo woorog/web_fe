@@ -6,7 +6,6 @@ import { MessageDto } from './dto/message.dto';
 import { LLMHistory } from './schemas/llmHistory.schemas';
 import { Model } from 'mongoose';
 
-
 @Injectable()
 export class ChatService {
   private readonly logger = new Logger(ChatService.name);

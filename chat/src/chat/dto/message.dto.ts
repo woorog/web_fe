@@ -3,4 +3,8 @@ export class MessageDto {
   message: string;
   nickname: string;
   ai: boolean;
+  ///
+  execInput: boolean;
+  execOutput?: string;
+  execId?: string;
 }

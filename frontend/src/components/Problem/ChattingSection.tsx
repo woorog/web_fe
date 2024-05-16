@@ -1,15 +1,25 @@
 import { useParams } from 'react-router-dom';
 import { memo, useEffect, useState } from 'react';
-import { Socket } from 'socket.io-client';
-import { ErrorData, ErrorResponse, MessageData } from './ChatComponents/ChatTypes';
-import ChattingMessage from './ChatComponents/ChattingMessage'
+import { Socket, io } from 'socket.io-client';
+import {
+  ErrorData,
+  ErrorResponse,
+  MessageData,
+} from './ChatComponents/ChatTypes';
+import ChattingMessage from './ChatComponents/ChattingMessage';
 import ChattingInput from './ChatComponents/ChattingInput';
 import ScrollDownButton from './ChatComponents/ScrollDownButton';
 import ChatSection from './ChatComponents/ChatSection';
 import ChatErrorToast from './ChatComponents/ChatErrorToast';
 import createSocket from './ChatComponents/CreateChatSocket';
-import { CHATTING_SOCKET_EMIT_EVENT, CHATTING_SOCKET_RECIEVE_EVENT } from '../../constants/chatEvents';
-import { CHATTING_ERROR_TEXT, CHATTING_ERROR_STATUS_CODE } from '../../constants/chatEvents';
+import {
+  CHATTING_SOCKET_EMIT_EVENT,
+  CHATTING_SOCKET_RECIEVE_EVENT,
+} from '../../constants/chatEvents';
+import {
+  CHATTING_ERROR_TEXT,
+  CHATTING_ERROR_STATUS_CODE,
+} from '../../constants/chatEvents';
 import useLastMessageViewingState from '../../hooks/useLastMessageViewingState';
 import useScroll from '../../hooks/useScroll';
 import { VITE_CHAT_SOCKET_SERVER_URL } from '../../constants/env';
@@ -31,10 +41,19 @@ const ChattingSection: React.FC<ChattingSectionProps> = ({ roomNumber }) => {
   const [errorData, setErrorData] = useState<ErrorData | null>(null);
   // const { roomId } = useParams();
 
-  const { ref: messageAreaRef, scrollRatio, handleScroll, moveToBottom } = useScroll<HTMLDivElement>();
-  const { isViewingLastMessage, isRecievedMessage, setIsRecievedMessage } = useLastMessageViewingState(scrollRatio);
+  const {
+    ref: messageAreaRef,
+    scrollRatio,
+    handleScroll,
+    moveToBottom,
+  } = useScroll<HTMLDivElement>();
+  const { isViewingLastMessage, isRecievedMessage, setIsRecievedMessage } =
+    useLastMessageViewingState(scrollRatio);
 
-  const handleRecieveMessage = (recievedMessage: MessageData | { using: boolean }) => {
+  const handleRecieveMessage = (
+    recievedMessage: MessageData | { using: boolean },
+  ) => {
+    console.log('Received message:', recievedMessage);
     const remoteUsingAi = 'using' in recievedMessage;
 
     if (remoteUsingAi) {
@@ -50,8 +69,10 @@ const ChattingSection: React.FC<ChattingSectionProps> = ({ roomNumber }) => {
   const handleChattingSocketError = (errorMessage: ErrorResponse) => {
     const { statusCode } = errorMessage;
 
-    const { MESSAGE_ERROR_CODE, SERVER_ERROR_CODE, AI_ERROR_CODE } = CHATTING_ERROR_STATUS_CODE;
-    const { MESSAGE_ERROR_TEXT, SERVER_ERROR_TEXT, AI_ERROR_TEXT } = CHATTING_ERROR_TEXT;
+    const { MESSAGE_ERROR_CODE, SERVER_ERROR_CODE, AI_ERROR_CODE } =
+      CHATTING_ERROR_STATUS_CODE;
+    const { MESSAGE_ERROR_TEXT, SERVER_ERROR_TEXT, AI_ERROR_TEXT } =
+      CHATTING_ERROR_TEXT;
 
     if (statusCode === MESSAGE_ERROR_CODE) setErrorData(MESSAGE_ERROR_TEXT);
     if (statusCode === SERVER_ERROR_CODE) setErrorData(SERVER_ERROR_TEXT);
@@ -61,15 +82,15 @@ const ChattingSection: React.FC<ChattingSectionProps> = ({ roomNumber }) => {
   const socketConnect = async () => {
     const socketURL = VITE_CHAT_SOCKET_SERVER_URL;
     const socketCallbacks = {
-      'new_message': handleRecieveMessage,
+      new_message: handleRecieveMessage,
       exception: handleChattingSocketError,
     };
-  
+
     const newSocket = createSocket(socketURL, socketCallbacks);
     newSocket.connect();
     // newSocket.emit('join_room', { room: roomId });
     newSocket.emit('join_room', { room: roomNumber });
-  
+
     setSocket(newSocket);
   };
 
@@ -82,6 +103,8 @@ const ChattingSection: React.FC<ChattingSectionProps> = ({ roomNumber }) => {
     else setIsRecievedMessage(true);
   }, [allMessages]);
 
+  // console.log('This is all message', allMessages);
+
   return (
     <ChatSection>
       <div className="flex relative flex-col items-center justify-center w-full pt-2 h-full rounded-lg bg-primary min-w-[150px]">
@@ -91,11 +114,19 @@ const ChattingSection: React.FC<ChattingSectionProps> = ({ roomNumber }) => {
           onScroll={handleScroll}
         >
           {allMessages.map((messageData, index) => (
-            <ChattingMessage messageData={messageData} key={index} isMyMessage={messageData.socketId === socket?.id} />
+            <ChattingMessage
+              messageData={messageData}
+              key={index}
+              isMyMessage={messageData.socketId === socket?.id}
+            />
           ))}
         </div>
-        {isRecievedMessage && <ScrollDownButton handleMoveToBottom={moveToBottom} />}
-        {errorData && <ChatErrorToast errorData={errorData} setErrorData={setErrorData} />}
+        {isRecievedMessage && (
+          <ScrollDownButton handleMoveToBottom={moveToBottom} />
+        )}
+        {errorData && (
+          <ChatErrorToast errorData={errorData} setErrorData={setErrorData} />
+        )}
         <ChattingInput
           usingAi={usingAi}
           setUsingAi={setUsingAi}
@@ -104,10 +135,12 @@ const ChattingSection: React.FC<ChattingSectionProps> = ({ roomNumber }) => {
           setPostingAi={setPostingAi}
           moveToBottom={moveToBottom}
           roomNumber={roomNumber}
+          ///
+          execInput={false} // 기본값 설정
         />
       </div>
     </ChatSection>
   );
-}
+};
 
 export default memo(ChattingSection);

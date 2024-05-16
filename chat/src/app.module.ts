@@ -1,4 +1,3 @@
-
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -6,6 +5,7 @@ import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ChatModule } from './chat/chat.module';
+import { ExecuteModule } from './execute/execute.module';
 
 @Module({
   imports: [
@@ -32,6 +32,7 @@ import { ChatModule } from './chat/chat.module';
       inject: [ConfigService],
     }),
     ChatModule,
+    ExecuteModule,
   ],
   controllers: [AppController],
   providers: [AppService],

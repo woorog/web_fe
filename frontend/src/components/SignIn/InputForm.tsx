@@ -67,10 +67,10 @@ export const SigninInputForm = () => {
           <span className="text-black">sending...</span>
         ) : (
           <div className="flex justify-center space-x-4 mt-6">
-            <button type={'submit'} className="bg-black text-white py-3 px-6 rounded-lg hover:bg-gray-700 shadow-lg transition duration-300">
+            <button type={'submit'} className="bg-sublime-dark-grey-blue text-white py-3 px-6 rounded-lg hover:bg-gray-800 shadow-lg transition duration-300">
               로그인
             </button>
-            <Link to={'/signup'} className="bg-black text-white py-3 px-6 rounded-lg hover:bg-gray-700 shadow-lg transition duration-300">
+            <Link to={'/signup'} className="bg-sublime-dark-grey-blue text-white py-3 px-6 rounded-lg hover:bg-gray-800 shadow-lg transition duration-300">
               회원가입
             </Link>
           </div>

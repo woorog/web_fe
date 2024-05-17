@@ -52,6 +52,7 @@ export const HeaderContainer = styled.div`
 `;
 
 export const AnchorLogo = styled(Link)`
+  color: white;
   font-weight: 700;
   font-size: 2rem;
   cursor: pointer;
@@ -64,18 +65,21 @@ export const GreenMark = styled.mark`
 `;
 
 export const MenuContainer = styled.div`
+  display: flex;
+  gap: 1rem; /* Adjust spacing between buttons as needed */
   margin-bottom: 2rem;
   min-width: 8rem;
-  width: 8rem;
+  width: 20rem;
 
   button {
     cursor: pointer;
-    font-family: Noto Sans KR, sans-serif;
+    font-family: 'Noto Sans KR', sans-serif;
     font-weight: 500;
     font-size: 0.7rem;
     border: none;
     background: none;
     min-width: 4rem;
+    color: white;
   }
 
   a:nth-child(1) {
@@ -83,4 +87,4 @@ export const MenuContainer = styled.div`
       border-right: solid 1px silver;
     }
   }
-`;
+  `;

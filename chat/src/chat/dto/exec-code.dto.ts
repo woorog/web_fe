@@ -1,0 +1,3 @@
+class ExecCodeDto {
+    content: string;
+}

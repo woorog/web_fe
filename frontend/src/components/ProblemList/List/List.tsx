@@ -1,4 +1,3 @@
-
 import React from 'react';
 import styled from 'styled-components';
 import Problem from './Problem';
@@ -11,12 +10,21 @@ type ListType = {
 };
 
 const ListContainer = styled.div`
-  min-width: 100rem;
-  width: 180rem;
+  width: 100%;
+  max-width: 100%;
   margin: 0 auto;
   display: flex;
   padding: 0 5rem;
-  flex-direction: column; // 자식 요소들을 세로로 정렬
+  flex-direction: column;
+  box-sizing: border-box;
+
+  @media (max-width: 1024px) {
+    padding: 0 2rem;
+  }
+
+  @media (max-width: 768px) {
+    padding: 0 1rem;
+  }
 `;
 
 const Info = styled.div`
@@ -41,4 +49,3 @@ const List = ({ list }: ListType) => {
 };
 
 export default List;
-

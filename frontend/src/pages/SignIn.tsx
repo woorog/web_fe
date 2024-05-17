@@ -24,7 +24,7 @@ export const SignIn = () => {
       <div className="w-full h-32 box-border">
         <MainHeader />
       </div>
-      <div className="w-full flex-1 box-border bg-[#e4e8e0] flex justify-center">
+      <div className="w-full flex-1 box-border sublime-dark-grey-blue flex justify-center">
         <SigninInputForm />
       </div>
       <div className="w-full h-[400px] box-border">

@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.selectable-text {
+    user-select: text; /* Standard syntax */
+    -webkit-user-select: text; /* For Safari */
+    -moz-user-select: text; /* For Firefox */
+    -ms-user-select: text; /* For Internet Explorer and Edge */
+  }

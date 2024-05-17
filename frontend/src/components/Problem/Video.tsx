@@ -1,83 +1,21 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
-import io, { Socket } from 'socket.io-client';
+import io from 'socket.io-client';
 import { Peer } from 'peerjs';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { socketState } from '../../recoils';
 
-const VideoContainer = styled.div`
-  margin-top: 1rem;
-  width: 100%;
-  min-height: 9rem; // Minimum height for at least one video
-  display: flex;
-  flex-direction: column; // Stack children vertically
-  justify-content: flex-start; // Align children to the top of the container
-  align-items: center; // Center align horizontally
-  overflow: auto; // Allows scrolling when content exceeds the container's height
-`;
-
-const UserVideoContainer = styled.video`
-  max-width: 16rem;
-  width: 100%; // Takes full width of the container
-  max-height: 9rem;
-  height: auto; // Maintain aspect ratio
-  margin-bottom: 1rem; // Space between videos
-  background-color: #FFFFFF; // 배경을 흰색으로 설정
-`;
-
-const DivWrapper = styled.div`
-  position: relative;
-  max-height: 9rem;
-  width: 100%; // Ensure this matches the parent container width
-  height: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center; // Center align the video in this div
-
-  video {
-    width: 100%;
-  }
-`;
-
-const ButtonContainer = styled.div`
-  position: absolute;
-  left: 0.6rem;
-  bottom: 0.9rem;
-  display: flex;
-`;
-
-const ControllButton = styled.div`
-  cursor: pointer;
-  width: 100%;
-  display: block;
-  font-size: 1rem;
-  text-align: center;
-  z-index: 2;
-`;
-
-const Text = styled.div`
-  font-size: 0.8rem;
-  color: #777777;
-  position: absolute;
-  bottom: -1rem;
-  left: 0;
-  text-align: center;
-  width: 100%;
-`;
-
 type ConstraintsType = {
   audio?: boolean;
-  // eslint-disable-next-line @typescript-eslint/ban-types
   video?: boolean | Object;
 };
 
 const videoSize = {
   width: {
-    ideal: 1280,
+    ideal: 720,
   },
   height: {
-    ideal: 720,
+    ideal: 405,
   },
 };
 
@@ -307,31 +245,40 @@ export const Video = () => {
   };
 
   return (
-    <VideoContainer>
+    <div className="mt-4 w-full min-h-36 flex flex-col justify-start items-center overflow-auto">
       {Object.entries(peers).map((user, idx) => (
-          <UserVideoContainer
-                autoPlay
-                playsInline
-                ref={(ele) => {
-                  if (ele) {
-                    peerVideosRef.current[idx] = ele;
-                  }
-                }}
-                key={idx}
-            />
-        ))}
-        <DivWrapper>
-          <UserVideoContainer ref={videoRef} autoPlay muted playsInline />
-          <ButtonContainer>
-            <ControllButton onClick={handleMicButton}>
-              {micOn ? '🔊' : '🔔'}
-            </ControllButton>
-            <ControllButton onClick={handleCameraButton}>
-              {!videoOn ? '📸' : '🟥'}
-            </ControllButton>
-          </ButtonContainer>
-          <Text>{text}</Text>
-        </DivWrapper>
-      </VideoContainer>
+        <video
+          className="max-w-48 w-full max-h-36 h-auto mb-4 bg-white"
+          autoPlay
+          playsInline
+          ref={(ele) => {
+            if (ele) {
+              peerVideosRef.current[idx] = ele;
+            }
+          }}
+          key={idx}
+        />
+      ))}
+      <div className="relative max-h-36 w-full h-auto flex flex-col items-center">
+        <video
+          className="max-w-48 w-full max-h-36 h-auto mb-4 bg-white"
+          ref={videoRef}
+          autoPlay
+          muted
+          playsInline
+        />
+        <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex gap-2">
+          <div className="cursor-pointer text-base text-center z-10" onClick={handleMicButton}>
+            {micOn ? '🔊' : '🔔'}
+          </div>
+          <div className="cursor-pointer text-base text-center z-10" onClick={handleCameraButton}>
+            {!videoOn ? '📸' : '🟥'}
+          </div>
+        </div>
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-sm text-gray-600 text-center w-full">
+          {text}
+        </div>
+      </div>
+    </div>
   );
 };

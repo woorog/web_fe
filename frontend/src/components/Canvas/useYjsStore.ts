@@ -25,9 +25,7 @@ import * as Y from 'yjs'
 // 사용자정의 훅 정의
 export function useYjsStore({
 	roomId = 'example',
-	hostUrl = import.meta.env.MODE === 'development'
-		? 'ws://localhost:3334'
-		: 'wss://demos.yjs.dev',
+	hostUrl = 'wss://demos.yjs.dev',
 	shapeUtils = [],
 }: Partial<{
 	hostUrl: string

@@ -1,45 +1,30 @@
-// React Router를 사용해 URL 파라미터 및 네비게이션 기능을 사용
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-// 다양한 UI 컴포넌트와 페이지 요소를 임포트
-import { PageButtons, ProblemButtons } from '../components/Problem/Buttons';
+import { userState } from '../recoils';
+import { ProblemButtons } from '../components/Problem/Buttons';
+import PageButtons from '../components/Problem/Buttons/PageButtons';
 import { ProblemHeader } from '../components/ProblemHeader';
 import { ProblemContent, Result } from '../components/Problem';
-// TypeScript 인터페이스나 타입 정의를 사용
 import { ProblemInfo } from '@types';
-// 상태 관리를 위한 Recoil 훅
 import { useRecoilState } from 'recoil';
 import { editorState, gradingState } from '../recoils';
-// Additional utility
 import { Video } from '../components/Problem/Video';
 import editorColors from '../utils/editorColors';
 import LanguageSelector from '../components/Problem/LanguageSelector';
 import defaultCodes from '../utils/defaultCode';
-// 실시간 협업을 위한 Yjs 라이브러리와 WebRTC 연동
 import * as Y from 'yjs';
-// @ts-ignore
 import { yCollab } from 'y-codemirror.next';
 import { WebrtcProvider } from 'y-webrtc';
-// 코드 미러 라이브러리를 사용한 텍스트 에디터 설정
 import { EditorView, basicSetup } from 'codemirror';
 import { EditorState, Compartment } from '@codemirror/state';
 import { javascript } from '@codemirror/lang-javascript';
 import { python } from '@codemirror/lang-python';
 import { keymap } from '@codemirror/view';
 import { indentWithTab } from '@codemirror/commands';
-// 추가적인 훅, 유틸리티 컴포넌트
 import * as random from 'lib0/random';
 import { useUserState } from '../hooks/useUserState';
 import Canvas from '../components/Canvas/Canvas';
 import '../../App.css';
-
-// CSS in JS
-import {
-  Wrapper,
-  HeaderWrapper,
-  MainWrapper,
-  VideoContainer,
-} from './ProblemStyle';
 
 const URL = import.meta.env.VITE_SERVER_URL;
 const REM = getComputedStyle(document.documentElement).fontSize;
@@ -52,30 +37,49 @@ const langs = {
   Python: python(),
 };
 
+const styles = {
+  flipCard: {
+    backgroundColor: 'transparent',
+    width: '100%',
+    height: '100%',
+    perspective: '1000px',
+  },
+  flipCardInner: {
+    position: 'relative',
+    width: '100%',
+    height: '100%',
+    transition: 'transform 0.8s',
+    transformStyle: 'preserve-3d',
+  },
+  flipCardInnerFlipped: {
+    transform: 'rotateY(180deg)',
+  },
+  flipCardFrontBack: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    backfaceVisibility: 'hidden',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  flipCardBack: {
+    transform: 'rotateY(180deg)',
+  },
+};
+
+const whiteBackgroundTheme = EditorView.theme({
+  "&": {
+    backgroundColor: "white",
+  }
+}, { dark: false });
+
 const Problem = () => {
   useUserState();
 
-  const startResizing = (e: { preventDefault: () => void }) => {
-    e.preventDefault();
-    document.addEventListener('mousemove', resize);
-    document.addEventListener('mouseup', stopResize);
-  };
-
-  const resize = (e: { movementY: number }) => {
-    if (editorRef.current) {
-      // null 체크 추가
-      const currentHeight = editorRef.current.clientHeight;
-      const newHeight = currentHeight + e.movementY;
-      editorRef.current.style.height = `${newHeight}px`;
-    }
-  };
-  const stopResize = () => {
-    document.removeEventListener('mousemove', resize);
-    document.removeEventListener('mouseup', stopResize);
-  };
-
   const [leftWidth, setLeftWidth] = useState(50); // 초기 왼쪽 패널 너비 (퍼센트)
   const [showEditor, setShowEditor] = useState(true);
+  const [showResult, setShowResult] = useState(true);
+  const [user] = useRecoilState(userState);
   const navigate = useNavigate();
   const [, setGrade] = useRecoilState(gradingState);
   const [, setEState] = useState<EditorState>();
@@ -90,6 +94,15 @@ const Problem = () => {
   const [defaultCode, setDefaultCode] = useState({ ...defaultCodes });
   const problemRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
+
+  const [isFlippedRight, setIsFlippedRight] = useState(false);
+  const [isFlippedLeft, setIsFlippedLeft] = useState(true);
+  const handleFlipRight = () => {
+    setIsFlippedRight(!isFlippedRight);
+  };
+  const handleFlipLeft = () => {
+    setIsFlippedLeft(!isFlippedLeft);
+  };
 
   const ydoc = useMemo(() => new Y.Doc(), []);
   const [provider, ytext] = useMemo(() => {
@@ -184,24 +197,25 @@ const Problem = () => {
     if (eView) return;
     provider &&
       provider.awareness.setLocalStateField('user', {
-        name: 'Anonymous ' + Math.floor(Math.random() * 100),
+        name: user.ID,
         color: userColor.color,
         colorLight: userColor.light,
       });
-
+  
     const languageExtension = languageCompartment.of(langs['JavaScript']);
-
+  
     const extensions = [
       basicSetup,
       keymap.of([indentWithTab]),
       languageExtension,
+      whiteBackgroundTheme,
       EditorView.updateListener.of(function (e) {
         setText(e.state.doc.toString());
       }),
     ];
     provider &&
       extensions.push(yCollab(ytext, provider.awareness, { undoManager }));
-
+  
     const state = EditorState.create({
       doc: ytext.toString(),
       extensions,
@@ -243,13 +257,6 @@ const Problem = () => {
       }, 3000);
     }
   }, [eView]);
-
-  useEffect(() => {
-    window.addEventListener('resize', handleSize);
-    return () => {
-      window.removeEventListener('resize', handleSize);
-    };
-  }, []);
 
   useEffect(() => {
     setGrade({
@@ -329,99 +336,89 @@ const Problem = () => {
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
   };
-  return (
-      <Wrapper>
-        <HeaderWrapper>
-          <ProblemHeader
-              URL={
-                roomNumber
-                    ? `/problem/${version}/${id}/${roomNumber}`
-                    : `/problem/${version}/${id}`
-              }
-              problemName={problem?.title ? problem.title : ''}
-              type={0}
-          />
-        </HeaderWrapper>
-        <MainWrapper>
-          <div className="flex flex-row w-full p-4 overflow-x-hidden overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400">
-            {version === 'multi' && (
-                <VideoContainer>
-                  <Video />
-                </VideoContainer>
-            )}
-            <div
-                className="relative w-full h-full"
-                style={{ display: 'flex', width: `${leftWidth}%` }}
-            >
-              <button
-                  className="absolute top-0 left-1/2 transform -translate-x-1/2 mt-4 p-2 bg-white border border-gray-400 hover:bg-teal-100 focus:bg-white active:bg-white active:translate-y-1 active:shadow-inner font-medium text-center tracking-widest z-20"
-                  onClick={() => setShowEditor(!showEditor)}
-              >
-                {showEditor ? '캔버스' : '에디터'}
-              </button>
-              <div
-                  className="absolute inset-0 z-10 flex flex-col transition-opacity duration-1000 ease"
-                  style={{
-                    width: '100%',
-                    opacity: showEditor ? 1 : 0,
-                    visibility: showEditor ? 'visible' : 'hidden',
-                  }}
-              >
-                <div
-                    ref={editorRef}
-                    className="relative flex-grow p-2 user-select-text overflow-auto mt-2.5"
-                    style={{ flex: '0 0 60%' }} // 60% 고정
-                >
-                  {eView && (
-                      <LanguageSelector
-                          onClickModalElement={handleChangeEditorLanguage}
-                      />
-                  )}
-                </div>
-                <div
-                    className="cursor-row-resize bg-gray-300 h-1 z-20"
-                    onMouseDown={startResizing}
-                    style={{ touchAction: 'none' }}
-                ></div>
-                <div style={{ flex: '0 0 40%' }} // 40% 고정
-                >
-                  <Result roomNumber={roomNumber} />
-                </div>
-              </div>
 
-              <div
-                  className="absolute inset-0 z-10 flex flex-col transition-opacity duration-1000 ease"
-                  style={{
-                    width: '100%',
-                    opacity: showEditor ? 0 : 1,
-                    visibility: showEditor ? 'hidden' : 'visible',
-                  }}
-              >
-                <Canvas roomNumber={roomNumber} />
+  return (
+    <div className="w-full h-screen mx-auto flex flex-col select-none">
+      <div className="w-full h-16 bg-sublime-dark-grey-blue box-border">
+        <ProblemHeader
+          URL={
+            roomNumber
+              ? `/problem/${version}/${id}/${roomNumber}`
+              : `/problem/${version}/${id}`
+          }
+          problemName={problem?.title ? problem.title : ''}
+          type={0}
+        />
+      </div>
+      <div className="flex-grow w-full flex flex-col bg-slate-200">
+        <div className="flex flex-row w-full h-full p-4 overflow-x-hidden overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400">
+          {version === 'multi' && (
+            <div className="relative w-1/6 h-full">
+              <div className="w-full mb-2">
+              <PageButtons />
+              </div>
+              <div className="w-full">
+                <Video />
               </div>
             </div>
-
-            <div
-                onMouseDown={handleMouseDown}
-                style={{
-                  width: '10px',
-                  backgroundColor: '#eef5f0',
-                  cursor: 'ew-resize',
-                  height: '100%',
-                }}
-            />
-
-            <div
-                className="flex-grow h-full flex flex-col min-w-1/4"
-                style={{ width: `${100 - leftWidth}%` }}
+          )}
+          <div className="relative h-full flex flex-col px-4" style={{ width: `${leftWidth}%` }}>
+            <button
+              className="text-gray-900 bg-white hover:bg-gray-100 border border-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex justify-center items-center dark:focus:ring-gray-600 dark:bg-sublime-dark-grey-blue dark:border-gray-700 dark:text-white dark:hover:bg-gray-700 me-2 mb-2"
+              onClick={handleFlipLeft}
             >
-              <div className="w-full h-full overflow-auto">
-                {problem && <ProblemContent problem={problem} />}
+              {isFlippedLeft ? '화이트보드' : '코드에디터'}
+            </button>
+            <div style={styles.flipCard}>
+              <div
+                style={{
+                  ...styles.flipCardInner,
+                  ...(isFlippedLeft ? styles.flipCardInnerFlipped : {}),
+                }}
+              >
+                <div style={styles.flipCardFrontBack}>
+                  <div
+                    ref={editorRef}
+                    className="relative flex-grow p-2 select-text overflow-auto mt-2.5"
+                    style={{ flex: '1 1 auto' }}
+                  >
+                    {eView && (
+                      <LanguageSelector onClickModalElement={handleChangeEditorLanguage} />
+                    )}
+                  </div>
+                </div>
+                <div style={{ ...styles.flipCardFrontBack, ...styles.flipCardBack, padding: '0.5rem' }}>
+                  <Canvas roomNumber={roomNumber} />
+                </div>
               </div>
             </div>
           </div>
-        </MainWrapper>
-      </Wrapper>
+          <div className="flex-grow h-full flex flex-col min-w-1/4" style={{ width: `${100 - leftWidth}%` }}>
+            <button
+              className="text-gray-900 bg-white hover:bg-gray-100 border border-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex justify-center items-center dark:focus:ring-gray-600 dark:bg-sublime-dark-grey-blue dark:border-gray-700 dark:text-white dark:hover:bg-gray-700 me-2 mb-2"
+              onClick={handleFlipRight}
+            >
+              {isFlippedRight ? '문제' : '채팅'}
+            </button>
+            <div style={styles.flipCard}>
+              <div
+                style={{
+                  ...styles.flipCardInner,
+                  ...(isFlippedRight ? styles.flipCardInnerFlipped : {}),
+                }}
+              >
+                <div style={styles.flipCardFrontBack}>
+                  <Result roomNumber={roomNumber} />
+                </div>
+                <div style={{ ...styles.flipCardFrontBack, ...styles.flipCardBack }}>
+                  {problem && <ProblemContent problem={problem} />}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

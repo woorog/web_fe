@@ -4,7 +4,14 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'custom-sky': '#cceeff' // Example hexadecimal code for a sky blue shade
+        'custom-sky': '#cceeff',
+        'sublime-purple': '#bf91c0',
+        'sublime-orange': '#f27957',
+        'sublime-light-grey': '#9ea4b0',
+        'sublime-light-blue': '#6495c6',
+        'sublime-light-turquoise' : '#5fb4b4',
+        'sublime-desaturated-red': '#f47a57',
+        'sublime-dark-grey-blue': '#303841',
       },
     },
   },

@@ -16,7 +16,7 @@ const clickDisable = (document: Document) => {
 
 interface ProblemIframeProps {
   htmlData?: string;
-  className?: string;  // Optional className prop
+  className?: string;
 }
 
 export default function ProblemIframe({ htmlData }: { htmlData?: string }) {

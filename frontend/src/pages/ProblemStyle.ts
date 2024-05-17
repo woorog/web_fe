@@ -63,37 +63,6 @@ export const ProblemWrapper = styled.div`
   }
 `;
 
-// const ProblemWrapper = styled.div`
-//   width: 50%;
-//   min-width: 15%;
-//   height: auto;
-//   padding: 1rem;
-//   position: relative;
-//
-//   word-break: break-all;
-//   overflow-x: hidden;
-//   overflow-y: scroll;
-//
-//   ::-webkit-scrollbar {
-//     width: 20px;
-//   }
-//
-//   ::-webkit-scrollbar-track {
-//     background-color: transparent;
-//   }
-//
-//   ::-webkit-scrollbar-thumb {
-//     background-color: #d6dee1;
-//     border-radius: 20px;
-//     border: 6px solid transparent;
-//     background-clip: content-box;
-//   }
-//
-//   ::-webkit-scrollbar-thumb:hover {
-//     background-color: #a8bbbf;
-//   }
-// `;
-
 export const SolvingWrapper = styled.div`
   flex-grow: 1;
   height: 100%;

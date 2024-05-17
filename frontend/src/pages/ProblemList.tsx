@@ -53,16 +53,14 @@ const ProblemList = () => {
   }, [filter, list]);
 
   return (
-    <div className="flex flex-col items-center w-full min-w-[100rem] min-h-[100rem] bg-black text-white">
-      <div className="w-full min-h-[8rem] h-[8rem] min-w-[100rem]">
+    <div className="flex flex-col items-center w-full min-h-screen bg-sublime-dark-grey-blue text-white">
+      <div className="w-full h-20">
         <MainHeader />
       </div>
-      <SearchFilter />
-      <div className="flex w-full h-[60rem]">
-        <List list={filtered} />
+      <div className="w-full h-20">
       </div>
-      <div className="w-full ">
-        <Footer />
+      <div className="flex flex-grow w-full overflow-auto">
+        <List list={filtered} />
       </div>
     </div>
   );

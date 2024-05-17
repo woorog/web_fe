@@ -1,7 +1,7 @@
 import { memo, useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
 import { ErrorData, ErrorResponse, MessageData } from './ChatComponents/ChatTypes';
-import ChattingMessage from './ChatComponents/ChattingMessage'
+import ChattingMessage from './ChatComponents/ChattingMessage';
 import ChattingInput from './ChatComponents/ChattingInput';
 import ScrollDownButton from './ChatComponents/ScrollDownButton';
 import ChatSection from './ChatComponents/ChatSection';
@@ -20,8 +20,9 @@ const ChattingSection: React.FC<ChattingSectionProps> = ({ roomNumber }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [allMessages, setAllMessage] = useState<MessageData[]>([]);
 
-  const [usingAi, setUsingAi] = useState<boolean>(false);
+  const [messageType, setMessageType] = useState<'human' | 'ai' | 'exec'>('human');
   const [postingAi, setPostingAi] = useState<boolean>(false);
+  const [postingExec, setPostingExec] = useState<boolean>(false);
 
   const [errorData, setErrorData] = useState<ErrorData | null>(null);
 
@@ -38,18 +39,23 @@ const ChattingSection: React.FC<ChattingSectionProps> = ({ roomNumber }) => {
 
     if (recievedMessage.ai) setPostingAi(false);
 
+    if ('exec' in recievedMessage && recievedMessage.exec) {
+      setPostingExec(false); // Stop the spinner for exec messages
+    }
+
     setAllMessage((prev) => [...prev, recievedMessage]);
   };
 
   const handleChattingSocketError = (errorMessage: ErrorResponse) => {
     const { statusCode } = errorMessage;
 
-    const { MESSAGE_ERROR_CODE, SERVER_ERROR_CODE, AI_ERROR_CODE } = CHATTING_ERROR_STATUS_CODE;
-    const { MESSAGE_ERROR_TEXT, SERVER_ERROR_TEXT, AI_ERROR_TEXT } = CHATTING_ERROR_TEXT;
+    const { MESSAGE_ERROR_CODE, SERVER_ERROR_CODE, AI_ERROR_CODE, EXEC_ERROR_CODE } = CHATTING_ERROR_STATUS_CODE;
+    const { MESSAGE_ERROR_TEXT, SERVER_ERROR_TEXT, AI_ERROR_TEXT, EXEC_ERROR_TEXT } = CHATTING_ERROR_TEXT;
 
     if (statusCode === MESSAGE_ERROR_CODE) setErrorData(MESSAGE_ERROR_TEXT);
     if (statusCode === SERVER_ERROR_CODE) setErrorData(SERVER_ERROR_TEXT);
     if (statusCode === AI_ERROR_CODE) setErrorData(AI_ERROR_TEXT);
+    if (statusCode === EXEC_ERROR_CODE) setErrorData(EXEC_ERROR_TEXT);
   };
 
   const socketConnect = async () => {
@@ -58,14 +64,15 @@ const ChattingSection: React.FC<ChattingSectionProps> = ({ roomNumber }) => {
       'new_message': handleRecieveMessage,
       exception: handleChattingSocketError,
     };
-  
+
     const newSocket = createSocket(socketURL, socketCallbacks);
     newSocket.connect();
-    
+
     newSocket.emit('join_room', { room: roomNumber });
-  
+
     setSocket(newSocket);
   };
+
   useEffect(() => {
     socketConnect();
   }, []);
@@ -90,11 +97,13 @@ const ChattingSection: React.FC<ChattingSectionProps> = ({ roomNumber }) => {
         {isRecievedMessage && <ScrollDownButton handleMoveToBottom={moveToBottom} />}
         {errorData && <ChatErrorToast errorData={errorData} setErrorData={setErrorData} />}
         <ChattingInput
-          usingAi={usingAi}
-          setUsingAi={setUsingAi}
+          messageType={messageType}
+          setMessageType={setMessageType}
           postingAi={postingAi}
-          socket={socket}
           setPostingAi={setPostingAi}
+          postingExec={postingExec}
+          setPostingExec={setPostingExec}
+          socket={socket}
           moveToBottom={moveToBottom}
           roomNumber={roomNumber}
         />

@@ -46,7 +46,7 @@ function ProblemViewSection() {
   if (error) return <ErrorView error={error} />;
 
   return (
-      <div className="flex flex-col w-full h-full max-w-4xl mx-auto">  {/* h-full 추가하여 높이를 부모에 맞춤 */}
+      <div className="flex flex-col w-full h-full max-w-4xl mx-auto p-1 drop-shadow-lg">  {/* h-full 추가하여 높이를 부모에 맞춤 */}
         <ProblemSection>
           <div className="flex flex-col items-center justify-center w-full h-full gap-4 p-4"> {/* 여기서도 h-full 추가 */}
             <form onSubmit={handleSubmit} className="w-full">
@@ -56,7 +56,7 @@ function ProblemViewSection() {
                   className="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                   value={value}
                   onChange={onChange}
-                  placeholder="링크를 입력하세요"
+                  placeholder="URL을 입력하세요"
               />
             </form>
             {data && url ? <ProblemIframe htmlData={data}/> :

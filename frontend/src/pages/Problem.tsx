@@ -37,6 +37,25 @@ const langs = {
   Python: python(),
 };
 
+interface EditorCanvasToggleProps {
+  isVisible: boolean;
+  toggleVisibility: () => void;
+  label: string;
+}
+
+const EditorCanvasToggle: React.FC<EditorCanvasToggleProps> = ({ isVisible, toggleVisibility, label }) => {
+  return (
+    <button
+      className={`w-1/2 ${
+        isVisible ? 'border border-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex justify-center items-center dark:focus:ring-gray-600 dark:bg-sublime-yellow dark:border-gray-700 dark:text-black' : 'border border-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex justify-center items-center dark:focus:ring-gray-600 dark:bg-sublime-dark-grey-blue dark:border-gray-700 dark:text-white dark:hover:bg-gray-700'
+      } `}
+      onClick={toggleVisibility}
+    >
+      {label}
+    </button>
+  );
+};
+
 const styles = {
   flipCard: {
     backgroundColor: 'transparent',
@@ -65,6 +84,43 @@ const styles = {
   flipCardBack: {
     transform: 'rotateY(180deg)',
   },
+  editorContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+  },
+  editorTop: {
+    flex: '2',
+    overflow: 'auto',
+    padding: '0.5rem',
+    backgroundColor: 'white',
+    borderRadius: '0.5rem',
+  },
+  editorBottom: {
+    flex: '1',
+    display: 'flex',
+    flexDirection: 'column',
+    padding: '0.5rem',
+    backgroundColor: 'white',
+    borderRadius: '0.5rem',
+    marginTop: '0.5rem',
+  },
+  textArea: {
+    flex: '1',
+    marginBottom: '0.5rem',
+    padding: '0.5rem',
+    border: '1px solid #ddd',
+    borderRadius: '0.5rem',
+  },
+  runButton: {
+    alignSelf: 'flex-end',
+    padding: '0.5rem 1rem',
+    backgroundColor: '#007bff',
+    color: 'white',
+    borderRadius: '0.5rem',
+    border: 'none',
+    cursor: 'pointer',
+  },
 };
 
 const whiteBackgroundTheme = EditorView.theme({
@@ -77,8 +133,8 @@ const Problem = () => {
   useUserState();
 
   const [leftWidth, setLeftWidth] = useState(50); // 초기 왼쪽 패널 너비 (퍼센트)
-  const [showEditor, setShowEditor] = useState(true);
-  const [showResult, setShowResult] = useState(true);
+  const [isEditorVisible, setIsEditorVisible] = useState(true);
+  const [isCanvasVisible, setIsCanvasVisible] = useState(false);
   const [user] = useRecoilState(userState);
   const navigate = useNavigate();
   const [, setGrade] = useRecoilState(gradingState);
@@ -102,6 +158,16 @@ const Problem = () => {
   };
   const handleFlipLeft = () => {
     setIsFlippedLeft(!isFlippedLeft);
+  };
+
+  const handleToggleEditor = () => {
+    setIsEditorVisible(true);
+    setIsCanvasVisible(false);
+  };
+
+  const handleToggleCanvas = () => {
+    setIsEditorVisible(false);
+    setIsCanvasVisible(true);
   };
 
   const ydoc = useMemo(() => new Y.Doc(), []);
@@ -337,15 +403,16 @@ const Problem = () => {
     document.addEventListener('mouseup', handleMouseUp);
   };
 
+  const handleRunCode = () => {
+    // Placeholder for running the code
+    console.log('Run code:', text);
+  };
+
   return (
     <div className="w-full h-screen mx-auto flex flex-col select-none">
       <div className="w-full h-16 bg-sublime-dark-grey-blue box-border">
         <ProblemHeader
-          URL={
-            roomNumber
-              ? `/problem/${version}/${id}/${roomNumber}`
-              : `/problem/${version}/${id}`
-          }
+          URL={roomNumber ? `/problem/${version}/${id}/${roomNumber}` : `/problem/${version}/${id}`}
           problemName={problem?.title ? problem.title : ''}
           type={0}
         />
@@ -355,7 +422,7 @@ const Problem = () => {
           {version === 'multi' && (
             <div className="relative w-1/6 h-full">
               <div className="w-full mb-2">
-              <PageButtons />
+                <PageButtons />
               </div>
               <div className="w-full">
                 <Video />
@@ -363,28 +430,50 @@ const Problem = () => {
             </div>
           )}
           <div className="relative h-full flex flex-col px-4" style={{ width: `${leftWidth}%` }}>
-            <button
-              className="text-gray-900 bg-white hover:bg-gray-100 border border-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex justify-center items-center dark:focus:ring-gray-600 dark:bg-sublime-dark-grey-blue dark:border-gray-700 dark:text-white dark:hover:bg-gray-700 me-2 mb-2"
-              onClick={handleFlipLeft}
-            >
-              {isFlippedLeft ? '화이트보드' : '코드에디터'}
-            </button>
+            <div className="flex w-full mb-2 space-x-2">
+              <EditorCanvasToggle
+                isVisible={isEditorVisible}
+                toggleVisibility={handleToggleEditor}
+                label="코드에디터"
+              />
+              <EditorCanvasToggle
+                isVisible={isCanvasVisible}
+                toggleVisibility={handleToggleCanvas}
+                label="화이트보드"
+              />
+            </div>
             <div style={styles.flipCard}>
               <div
                 style={{
                   ...styles.flipCardInner,
-                  ...(isFlippedLeft ? styles.flipCardInnerFlipped : {}),
+                  ...(isCanvasVisible ? styles.flipCardInnerFlipped : {}),
                 }}
               >
-                <div style={styles.flipCardFrontBack}>
-                  <div
-                    ref={editorRef}
-                    className="relative flex-grow p-2 select-text overflow-auto mt-2.5"
-                    style={{ flex: '1 1 auto' }}
-                  >
-                    {eView && (
-                      <LanguageSelector onClickModalElement={handleChangeEditorLanguage} />
-                    )}
+                <div style={styles.flipCardFrontBack} className="drop-shadow-lg rounded-lg">
+                  <div style={styles.editorContainer}>
+                    <div
+                      ref={editorRef}
+                      className="relative flex-grow select-text overflow-auto mt-2.5 rounded-lg"
+                      style={styles.editorTop}
+                    >
+                      {eView && (
+                        <LanguageSelector onClickModalElement={handleChangeEditorLanguage} />
+                      )}
+                    </div>
+                    <div style={styles.editorBottom}>
+                      <textarea
+                        style={styles.textArea}
+                        placeholder="Input"
+                      />
+                      <textarea
+                        style={styles.textArea}
+                        placeholder="Output"
+                        disabled
+                      />
+                      <button style={styles.runButton} onClick={handleRunCode}>
+                        Run
+                      </button>
+                    </div>
                   </div>
                 </div>
                 <div style={{ ...styles.flipCardFrontBack, ...styles.flipCardBack, padding: '0.5rem' }}>

@@ -54,7 +54,8 @@ export class CrawlerService {
     });
     const page = await browser.newPage();
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36');
-    await page.goto(url);
+    const bjUrl = 'https://www.acmicpc.net/problem/' + url
+    await page.goto(bjUrl);
     let contents = await page.content();
     await browser.close();
 

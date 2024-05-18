@@ -54,16 +54,18 @@ const ProblemList = () => {
 
   return (
     <div className="flex flex-col items-center w-full min-h-screen bg-sublime-dark-grey-blue text-white">
-      <div className="w-full h-20">
+      <div className="w-full h-10">
         <MainHeader />
       </div>
       <div className="w-full h-20">
       </div>
       <div className="flex flex-grow w-full overflow-auto">
-        <List list={filtered} />
+        <div className="w-full h-full flex flex-col">
+          <List list={filtered} />
+        </div>
       </div>
     </div>
-  );
+  );  
 };
 
 export default ProblemList;

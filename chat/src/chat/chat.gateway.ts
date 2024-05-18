@@ -97,7 +97,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     this.chatService.validateSendMessage(data);
 
-    const { room, message, nickname, ai , exec } = data;
+    const { room, message, nickname, ai, exec } = data;
 
     this.logger.log(`Instance ${this.instanceId} - message: ${data.message}`);
 
@@ -198,7 +198,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async processAIResponse(room: string, message: string, socketId: string): Promise<LLMMessageDto> {
     try {
         const response = await this.useLLM(room, message, socketId);
-        // this.logger.log(`Processing AI llmStream: ${JSON.stringify(response)}`);
+        this.logger.log(`Processing AI llmStream: ${JSON.stringify(response)}`);
         
         const result = response.result;
         if (!result || !result.message) {
@@ -210,7 +210,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
             throw new Error('Missing role or content in AI message.');
         }
 
-        // this.logger.log(`Extracted message from AI: role = ${role}, content = ${content}`);
+        this.logger.log(`Extracted message from AI: role = ${role}, content = ${content}`);
 
         return {
             role: role,

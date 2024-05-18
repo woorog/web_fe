@@ -133,7 +133,7 @@ export const SignupInputForm = () => {
             />
             <button
               type="button"
-              className="ml-2 px-6 py-3 bg-sublime-dark-grey-blue text-white rounded-lg hover:bg-gray-600 transition duration-300 text-xl"
+              className="ml-2 px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-400 transition duration-300 text-xl"
               onClick={handleIdCheck}
             >
               중복 확인
@@ -174,14 +174,14 @@ export const SignupInputForm = () => {
         <div className="flex justify-between mt-4">
           <button
             type="reset"
-            className="px-6 py-3 bg-sublime-dark-grey-blue text-white rounded-lg hover:bg-gray-600 transition duration-300 text-xl"
+            className="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition duration-300 text-xl"
             onClick={handleClear}
           >
             초기화
           </button>
           <button
             type="submit"
-            className="px-6 py-3 bg-sublime-light-turquoise text-white rounded-lg hover:bg-[#7ec1c1] transition duration-300 text-xl"
+            className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-500 transition duration-300 text-xl"
           >
             회원가입
           </button>

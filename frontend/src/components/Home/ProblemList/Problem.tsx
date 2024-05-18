@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react';
+import { memo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { ProblemType } from '@types';
 import { Link } from 'react-router-dom';

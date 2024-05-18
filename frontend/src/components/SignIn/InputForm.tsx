@@ -52,25 +52,44 @@ export const SigninInputForm = () => {
 
   return (
     <>
-      <div className="p-4 text-xl font-bold">
-      </div>
+      <div className="p-4 text-xl font-bold"></div>
       <form onSubmit={handleSubmit} className="space-y-4 text-xl font-bold">
         <div className="flex flex-col">
-          <label htmlFor={'id'} className="text-black">아이디</label>
-          <input type={'text'} ref={id} id={'id'} className="mt-1 p-2 border rounded text-black"/>
+          <label htmlFor={'id'} className="text-black">
+            아이디
+          </label>
+          <input
+            type={'text'}
+            ref={id}
+            id={'id'}
+            className="mt-1 p-2 border rounded text-black"
+          />
         </div>
         <div className="flex flex-col">
-          <label htmlFor={'password'} className="text-black">비밀번호</label>
-          <input type={'password'} ref={password} id={'password'} className="mt-1 p-2 border rounded text-black"/>
+          <label htmlFor={'password'} className="text-black">
+            비밀번호
+          </label>
+          <input
+            type={'password'}
+            ref={password}
+            id={'password'}
+            className="mt-1 p-2 border rounded text-black"
+          />
         </div>
         {isLoading ? (
           <span className="text-black">sending...</span>
         ) : (
           <div className="flex justify-center space-x-4 mt-6">
-            <button type={'submit'} className="bg-sublime-dark-grey-blue text-white py-3 px-6 rounded-lg hover:bg-gray-800 shadow-lg transition duration-300">
+            <button
+              type={'submit'}
+              className="bg-black text-white py-3 px-6 rounded-lg hover:bg-gray-700 shadow-lg transition duration-300"
+            >
               로그인
             </button>
-            <Link to={'/signup'} className="bg-sublime-dark-grey-blue text-white py-3 px-6 rounded-lg hover:bg-gray-800 shadow-lg transition duration-300">
+            <Link
+              to={'/signup'}
+              className="bg-black text-white py-3 px-6 rounded-lg hover:bg-gray-700 shadow-lg transition duration-300"
+            >
               회원가입
             </Link>
           </div>
@@ -78,5 +97,4 @@ export const SigninInputForm = () => {
       </form>
     </>
   );
-  
 };

@@ -41,24 +41,29 @@ export const Video = () => {
   const [socket, setSocket] = useRecoilState(socketState);
 
   useEffect(() => {
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((mediaStream) => {
-      setVideoOn(true);
-      setMicOn(true);
-      setMyStream(mediaStream);
-      setMyPeer(new Peer());
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then((mediaStream) => {
+        setVideoOn(true);
+        setMicOn(true);
+        setMyStream(mediaStream);
+        setMyPeer(new Peer());
 
-      const socketUrl = import.meta.env.VITE_SOCKET_SERVER_URL;
+        const socketUrl = import.meta.env.VITE_SOCKET_SERVER_URL;
 
-      const newSocket = io(socketUrl, {
-        reconnection: true,
-        reconnectionAttempts: 5,
-        reconnectionDelay: 1000,
+        const newSocket = io(socketUrl, {
+          path: '/socket-video/',
+          secure: true,
+          reconnection: true,
+          reconnectionAttempts: 5,
+          reconnectionDelay: 1000,
+        });
+
+        setSocket(newSocket);
+      })
+      .catch((error) => {
+        console.error('Error accessing media devices:', error);
       });
-
-      setSocket(newSocket);
-    }).catch((error) => {
-      console.error('Error accessing media devices:', error);
-    });
   }, []);
 
   const callCallback = useCallback(
@@ -266,10 +271,16 @@ export const Video = () => {
           playsInline
         />
         <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex gap-2">
-          <div className="cursor-pointer text-base text-center z-10" onClick={handleMicButton}>
+          <div
+            className="cursor-pointer text-base text-center z-10"
+            onClick={handleMicButton}
+          >
             {micOn ? '🔊' : '🔔'}
           </div>
-          <div className="cursor-pointer text-base text-center z-10" onClick={handleCameraButton}>
+          <div
+            className="cursor-pointer text-base text-center z-10"
+            onClick={handleCameraButton}
+          >
             {!videoOn ? '📸' : '🟥'}
           </div>
         </div>

@@ -4,48 +4,26 @@ interface ToggleAiProps {
 }
 
 export default function ToggleAi({ usingAi, setUsingAi }: ToggleAiProps) {
-  const handleChangeMessageType = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setUsingAi(event.target.value === 'ai');
+  const handleChangeMessageType = () => {
+    setUsingAi((prev) => !prev);
   };
 
   return (
     <div className="flex items-center gap-3 font-light whitespace-nowrap">
-      <div className="flex items-center gap-2">
-        <div className="flex items-center ps-4 pr-4">
-          <input
-            id="bordered-radio-1"
-            type="radio"
-            value="human"
-            name="bordered-radio"
-            checked={!usingAi}
-            onChange={handleChangeMessageType}
-            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 dark:bg-gray-700 dark:border-gray-600 focus:outline-none"
-          />
-          <label
-            htmlFor="bordered-radio-1"
-            className="w-full py-1 ms-2 text-sm font-medium text-neutral-950 dark:text-neutral-950"
-          >
-            Peer
-          </label>
-        </div>
-        <div className="flex items-center ps-4 pr-4">
-          <input
-            id="bordered-radio-2"
-            type="radio"
-            value="ai"
-            name="bordered-radio"
-            checked={usingAi}
-            onChange={handleChangeMessageType}
-            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 dark:bg-gray-700 dark:border-gray-600 focus:outline-none"
-          />
-          <label
-            htmlFor="bordered-radio-2"
-            className="w-full py-1 ms-2 text-sm font-medium text-neutral-950 dark:text-neutral-950"
-          >
-            CLOVA AI
-          </label>
-        </div>
-      </div>
+      <button
+        onClick={handleChangeMessageType}
+        type="button"
+        className={`relative flex w-12 h-6 gap-3 mb-2 ml-1 rounded-full ${
+          usingAi ? 'bg-gray-300' : 'bg-gray-300'
+        }`}
+      >
+        <div
+          className={`absolute w-5 h-5 ml-4 transition-[margin-left_1s_ease_in] bg-white rounded-full top-0.5 ${
+            usingAi ? 'left-2.5' : '-left-3.5'
+          }`}
+        />
+      </button>
+      <span className="text-xs">CLOVA AI 사용</span>
     </div>
   );
 }

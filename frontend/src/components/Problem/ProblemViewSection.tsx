@@ -21,14 +21,16 @@ function ProblemViewSection() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const isURL = value.match(/^(http(s)?:\/\/)[^\s@.][\w\s@.]+[.][^\s@.]+$/);
 
-    if (!isURL && inputRef.current) {
-      inputRef.current.placeholder = '잘못된 URL입니다!';
+    const inputNumber = Number(value);
+    const isValidNumber = !isNaN(inputNumber) && inputNumber >= 1000 && inputNumber <= 31900;
+
+    if (!isValidNumber && inputRef.current) {
+      inputRef.current.placeholder = '백준 문제 번호는 [1000 ~ 31900] 까지 있습니다';
       onReset();
       setTimeout(() => {
         if (inputRef.current)
-          inputRef.current.placeholder = '링크를 입력하세요';
+          inputRef.current.placeholder = '백준 문제 번호를 입력하세요 [1000 ~ 31900]';
       }, 1000);
       return;
     }
@@ -56,7 +58,7 @@ function ProblemViewSection() {
                   className="w-full p-2 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                   value={value}
                   onChange={onChange}
-                  placeholder="백준 문제 번호를 입력하세요"
+                  placeholder="백준 문제를 입력하세요"
               />
             </form>
             {data && url ? <ProblemIframe htmlData={data}/> :

@@ -21,11 +21,11 @@ function ChattingMessage({ messageData, isMyMessage }: ChattingMessageProps) {
 
   return (
     <div className={`flex flex-col gap-0.5 ${myMessage ? 'items-end' : 'items-start'}`}>
-      <span className="mx-1 text-xs font-light selectable-text">
+      <span className="mx-1 text-xs font-light">
         {aiMessage ? 'Clova X (AI)' : execMessage ? 'Code Execution Output' : messageData.nickname}
       </span>
       <div className={`px-4 py-2 rounded-lg w-fit ${getMessageColor()}`}>
-        <span className="whitespace-pre-wrap selectable-text">{messageData.message}</span>
+        <span className="whitespace-pre-wrap">{messageData.message}</span>
       </div>
     </div>
   );

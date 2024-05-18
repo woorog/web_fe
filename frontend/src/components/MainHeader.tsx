@@ -17,7 +17,7 @@ export const MainHeader = () => {
 
   return (
     <div className="flex items-center justify-between p-4 bg-sublime-dark-grey-blue">
-      <Link to="/" className="text-8xl font-bold text-white">
+      <Link to="/" className="text-7xl font-bold text-white">
         ONCORE
       </Link>
       <nav>

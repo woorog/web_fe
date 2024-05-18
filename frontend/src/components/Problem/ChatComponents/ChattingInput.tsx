@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { Socket } from 'socket.io-client';
 import Spinner from './Spinner';
-import ToggleMessageType from './ToggleMessageType';
+import ToggleMessageType from './ToggleMessateType';
 import { CHATTING_SOCKET_EMIT_EVENT } from '../../../constants/chatEvents';
 import useInput from '../../../hooks/useInput';
 import { useRecoilValue } from 'recoil';
@@ -77,7 +77,7 @@ export default function ChattingInput({ messageType, setMessageType, postingAi, 
           className={`w-full h-full p-2 px-4 focus:outline-none rounded-s-lg resize-none border-2 custom-scroll ${
             messageType === 'ai' ? 'border-point-blue' : 'border-point-blue'
           }`}
-          placeholder={messageType === 'ai' ? 'Ask AI for insight' : messageType === 'exec' ? 'Input for Code Execution | Type NULL for empty Input' : 'Message to Peer'}
+          placeholder={messageType === 'ai' ? 'Ask AI for insight' : messageType === 'exec' ? 'Input for Code Execution | Type null for empty Input' : 'Message to Peer'}
         />
         <button
           type="button"

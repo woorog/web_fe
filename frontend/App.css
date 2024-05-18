@@ -1,0 +1,30 @@
+/* App.css */
+@import url('https://fonts.googleapis.com/css?family=Rubik:700&display=swap');
+
+
+
+.fade-enter {
+    opacity: 0;
+    transform: rotateY(90deg);
+}
+.fade-enter-active {
+    opacity: 1;
+    transform: rotateY(0deg);
+    transition: opacity 500ms, transform 500ms;
+}
+.fade-exit {
+    opacity: 1;
+    transform: rotateY(0deg);
+}
+.fade-exit-active {
+    opacity: 0;
+    transform: rotateY(-90deg);
+    transition: opacity 500ms, transform 500ms;
+}
+
+.selectable-text {
+    user-select: text; /* Standard syntax */
+    -webkit-user-select: text; /* For Safari */
+    -moz-user-select: text; /* For Firefox */
+    -ms-user-select: text; /* For Internet Explorer and Edge */
+  }

@@ -10,10 +10,4 @@ export class CrawlerController {
     const content = await this.crawlerService.findOne(url);
     return content;
   }
-
-  @Get('/nginx')
-  async nginxCaching(@Query('url') url: string) {
-    const content = await this.crawlerService.findOne(url);
-    return content;
-  }
 }

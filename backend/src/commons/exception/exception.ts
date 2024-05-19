@@ -53,3 +53,9 @@ export class CrawlerException extends HttpException {
     super(message, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }
+
+export class ExecuteException extends HttpException {
+  constructor(message = '실행하는데 실패하였습니다.') {
+    super(message, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+}

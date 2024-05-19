@@ -3,7 +3,6 @@ export interface MessageData {
   nickname: string;
   socketId: string;
   ai: boolean;
-  exec: boolean;
 }
 
 export interface ErrorResponse {

@@ -11,6 +11,7 @@ import { CreateProblemDto } from './problem/dto/createProblem.dto';
 import { CreateTestCaseDto } from './test-case/dto/create-test-case.dto';
 import { TestCaseService } from './test-case/test-case.service';
 // import { CrawlerService } from './crawler/crawler.service';
+import { ExecuteService } from './execute/execute/execute.service';
 
 @Controller()
 export class AppController {
@@ -21,6 +22,7 @@ export class AppController {
     private readonly problemService: ProblemService,
     private readonly solvedService: SolvedService,
     // private readonly crawlerService: CrawlerService,
+    // private readonly executeSevice: ExecuteService,
   ) {}
 
   @Get()

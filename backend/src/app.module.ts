@@ -17,6 +17,7 @@ import { TestCaseModule } from './test-case/test-case.module';
 import { AuthModule } from './auth/auth.module';
 import { typeormConfig } from './config/typeorm.config';
 import { CrawlerModule } from './crawler/crawler.module';
+import { ExecuteModule } from './execute/execute/execute.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { CrawlerModule } from './crawler/crawler.module';
     SolvedModule,
     AuthModule,
     CrawlerModule,
+    ExecuteModule,
   ],
   controllers: [AppController],
   providers: [AppService],

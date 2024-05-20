@@ -4,10 +4,10 @@ import { Server as SocketIOServer } from 'socket.io';
 import { OPEN, Server as WebSocketServer } from 'ws';  // WS 라이브러리 import
 import cors from 'cors';
 
-
 const app = express();
 const socketServerPort = 3333;
 const webSocketServerPort = 5555;
+const resultSocketServerPort = 6666;
 
 app.use(cors());
 
@@ -41,15 +41,12 @@ io.on('connection', (socket) => {
       return;
     }
 
-    // logging('Join userId: ', userId);
-    // logging('RoomId: ', roomId);
-    
     socket.join(roomId);
     socket.to(roomId).emit('user-connected', userId);
 
-    // socket.on('disconnect', () => {
-    //   socket.to(roomId).emit('user-disconnected', userId);
-    // });
+    socket.on('disconnect', () => {
+      socket.to(roomId).emit('user-disconnected', userId);
+    });
   });
 
   socket.on('change-language', (roomId, code, lang) => {
@@ -68,7 +65,30 @@ wsServer.on('connection', socket => {
       }
     });
   });
+});
 
+const resultHttpServer = http.createServer(app);
+const resultIo = new SocketIOServer(resultHttpServer, {
+  cors: {
+    origin: '*',
+    credentials: true,
+    methods: ['GET', 'POST'],
+  },
+  cookie: true,
+});
+
+resultHttpServer.listen(resultSocketServerPort);
+
+resultIo.on('connection', (socket) => {
+  socket.on('join-room', (roomId) => {
+    socket.join(roomId);
+  });
+
+  socket.on('send-result', (roomId, result) => {
+    logging('RoomId: ', roomId);
+    logging('Result: ', result);
+    socket.to(roomId).emit('receive-result', result);
+  });
 });
 
 app.use(express.urlencoded({ extended: true }));

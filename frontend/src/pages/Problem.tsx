@@ -24,9 +24,12 @@ import { indentWithTab } from '@codemirror/commands';
 import * as random from 'lib0/random';
 import { useUserState } from '../hooks/useUserState';
 import Canvas from '../components/Canvas/Canvas';
+import axios from 'axios';
+import { io } from 'socket.io-client';
 import '../../App.css';
 
 const URL = import.meta.env.VITE_SERVER_URL;
+const socketURL = import.meta.env.VITE_SOCKET_SERVER_URL;
 const REM = getComputedStyle(document.documentElement).fontSize;
 const webRTCURL = import.meta.env.VITE_SOCKET_URL;
 
@@ -127,6 +130,9 @@ const styles = {
     border: 'none',
     cursor: 'pointer',
   },
+  resultSectionVisible: {
+    display: 'block',
+  },
 };
 
 const whiteBackgroundTheme = EditorView.theme(
@@ -144,6 +150,7 @@ const Problem = () => {
   const [leftWidth, setLeftWidth] = useState(50); // 초기 왼쪽 패널 너비 (퍼센트)
   const [isEditorVisible, setIsEditorVisible] = useState(true);
   const [isCanvasVisible, setIsCanvasVisible] = useState(false);
+  const [isResultVisible, setIsResultVisible] = useState(false);
   const [user] = useRecoilState(userState);
   const navigate = useNavigate();
   const [, setGrade] = useRecoilState(gradingState);
@@ -159,15 +166,24 @@ const Problem = () => {
   const [defaultCode, setDefaultCode] = useState({ ...defaultCodes });
   const problemRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
-
-  const [isFlippedRight, setIsFlippedRight] = useState(false);
-  const [isFlippedLeft, setIsFlippedLeft] = useState(true);
-  const handleFlipRight = () => {
-    setIsFlippedRight(!isFlippedRight);
-  };
-  const handleFlipLeft = () => {
-    setIsFlippedLeft(!isFlippedLeft);
-  };
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const resultRef = useRef<HTMLTextAreaElement>(null);
+  
+  const socket = useMemo(() => {
+    console.log('trying to connect');
+    const newSocket = io('https://oncore.site', {
+      path: '/socket-result/',
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+    });
+  
+    newSocket.on('connect', () => {
+      console.log('Socket connected successfully');
+    });
+  
+    return newSocket;
+  }, []);
 
   const handleToggleEditor = () => {
     setIsEditorVisible(true);
@@ -350,6 +366,20 @@ const Problem = () => {
     };
   }, []);
 
+  useEffect(() => {
+    socket.emit('join-room', roomNumber);
+
+    socket.on('receive-result', (result) => {
+      if (resultRef.current) {
+        resultRef.current.value = result;
+      }
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [socket]);
+
   const removeLocalStorage = () => {
     localStorage.removeItem('JavaScript');
     localStorage.removeItem('Python');
@@ -362,6 +392,8 @@ const Problem = () => {
   const getSavedCode = (language: string) => {
     return localStorage.getItem(language);
   };
+
+
 
   const handleChangeEditorLanguage = (language: string) => {
     if (eView) {
@@ -415,9 +447,46 @@ const Problem = () => {
     document.addEventListener('mouseup', handleMouseUp);
   };
 
-  const handleRunCode = () => {
-    // Placeholder for running the code
-    console.log('Run code:', text);
+  const handleRunCode = async() => {
+    if (eView) {
+      const versionMap: { [key: string]: string } = {
+        python: '3.10.0',
+        javaScript: '18.15.0',
+      };
+      const pistonUrl = 'https://emkc.org/api/v2/piston/execute'
+      const language = (code.language).toString().toLowerCase();
+      const version = versionMap[language];
+      const codeContent = eView.state.doc.toString();
+      const inputText = inputRef.current ? inputRef.current.value : '';
+      const payload = {
+        language: language,
+        version: version,
+        files: [
+          {
+              content: codeContent,
+          },
+        ],
+        stdin: inputText,
+      };
+
+      try {
+        const response = await axios.post(pistonUrl, payload);
+        let result = `INPUT\n${inputText}\nOUTPUT\n${response.data.run.output}`
+        if (resultRef.current) {
+          resultRef.current.value = result;
+        }
+        socket.emit('send-result', roomNumber, result);
+      } catch (error) {
+        if (resultRef.current) {
+          resultRef.current.value = "Error Executing Code";
+        }
+        socket.emit('send-result', roomNumber, "Error Executing Code");
+      }
+    }
+  };
+
+  const handleToggleResult = () => {
+    setIsResultVisible(!isResultVisible);
   };
 
   return (
@@ -485,10 +554,15 @@ const Problem = () => {
                       )}
                     </div>
                     <div style={styles.editorBottom}>
-                      <textarea style={styles.textArea} placeholder="Input" />
                       <textarea
+                        ref={inputRef}
                         style={styles.textArea}
-                        placeholder="Output"
+                        placeholder="Input"
+                      />
+                      <textarea
+                        ref={resultRef}
+                        style={styles.textArea}
+                        placeholder="Result"
                         disabled
                       />
                       <button style={styles.runButton} onClick={handleRunCode}>
@@ -509,38 +583,22 @@ const Problem = () => {
               </div>
             </div>
           </div>
-          <div
-            className="flex-grow h-full flex flex-col min-w-1/4"
-            style={{ width: `${100 - leftWidth}%` }}
-          >
-            <button
-              className="text-gray-900 bg-white hover:bg-gray-100 border border-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex justify-center items-center dark:focus:ring-gray-600 dark:bg-sublime-dark-grey-blue dark:border-gray-700 dark:text-white dark:hover:bg-gray-700 me-2 mb-2"
-              onClick={handleFlipRight}
-            >
-              {isFlippedRight ? '문제' : '채팅'}
-            </button>
-            <div style={styles.flipCard}>
-              <div
-                style={{
-                  ...styles.flipCardInner,
-                  ...(isFlippedRight ? styles.flipCardInnerFlipped : {}),
-                }}
-              >
-                <div style={styles.flipCardFrontBack}>
-                  <Result roomNumber={roomNumber} />
-                </div>
-                <div
-                  style={{
-                    ...styles.flipCardFrontBack,
-                    ...styles.flipCardBack,
-                  }}
-                >
-                  {problem && <ProblemContent problem={problem} />}
-                </div>
-              </div>
-            </div>
+          <div className="flex-grow h-full flex flex-col min-w-1/4" style={{ width: `${100 - leftWidth}%` }}>
+            {problem && <ProblemContent problem={problem} />}
           </div>
         </div>
+      </div>
+      <div 
+        className="fixed bottom-1/2 right-4 bg-blue-500 text-white rounded-full w-14 h-14 flex justify-center items-center cursor-pointer shadow-lg z-10"
+        onClick={handleToggleResult}
+      >
+        {isResultVisible ? 'X' : 'R'}
+      </div>
+      <div
+        className={`fixed bottom-4 right-4 bg-white border border-gray-200 rounded-lg p-4 shadow-lg overflow-y-auto ${isResultVisible ? 'block' : 'hidden'}`}
+        style={{ width: '41.666667%', height: '50vh' }}
+      >
+        <Result roomNumber={roomNumber} />
       </div>
     </div>
   );

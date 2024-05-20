@@ -3,5 +3,4 @@ export class MessageDto {
   message: string;
   nickname: string;
   ai: boolean;
-  exec: boolean;
 }

@@ -115,6 +115,8 @@ export const Video = () => {
       const temp = { ...peers };
       delete temp[userId];
       setPeers(temp);
+
+      
     },
     [peers],
   );

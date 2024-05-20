@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { userState } from '../recoils';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { useUserState } from '../hooks/useUserState';
+import logo from '../assets/TransparentBanner.png';
 
 export const MainHeader = () => {
   const [user, setUser] = useRecoilState(userState);
@@ -16,9 +17,9 @@ export const MainHeader = () => {
   }, [user.isLoggedIn, logoutHandler]);
 
   return (
-    <div className="flex items-center justify-between p-4 bg-sublime-dark-grey-blue">
+    <div className="flex items-center justify-between p-2 bg-transparent">
       <Link to="/" className="text-7xl font-bold text-white">
-        ONCORE
+        <img src={logo} alt="ONCORE" className="h-24" />
       </Link>
       <nav>
         <ul className="flex space-x-4">

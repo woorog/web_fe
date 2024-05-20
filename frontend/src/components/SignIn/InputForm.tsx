@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo, useState, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useUserState } from '../../hooks/useUserState';
-import { Link } from 'react-router-dom';
 
 export const SigninInputForm = () => {
   const [isLoading, setLoading] = useState(false);
@@ -51,32 +50,49 @@ export const SigninInputForm = () => {
   );
 
   return (
-    <>
+    <div className="flex flex-col items-center justify-center w-full max-w-4xl px-8 py-10 bg-white bg-opacity-80 shadow-lg rounded-xl">
       <div className="p-4 text-xl font-bold">
       </div>
-      <form onSubmit={handleSubmit} className="space-y-4 text-xl font-bold">
+      <form onSubmit={handleSubmit} className="w-full space-y-6 text-xl font-bold">
         <div className="flex flex-col">
-          <label htmlFor={'id'} className="text-black">아이디</label>
-          <input type={'text'} ref={id} id={'id'} className="mt-1 p-2 border rounded text-black"/>
+          <label htmlFor="id" className="text-black">아이디</label>
+          <input
+            type="text"
+            ref={id}
+            id="id"
+            className="mt-1 p-2 border rounded text-black"
+          />
         </div>
         <div className="flex flex-col">
-          <label htmlFor={'password'} className="text-black">비밀번호</label>
-          <input type={'password'} ref={password} id={'password'} className="mt-1 p-2 border rounded text-black"/>
+          <label htmlFor="password" className="text-black">비밀번호</label>
+          <input
+            type="password"
+            ref={password}
+            id="password"
+            className="mt-1 p-2 border rounded text-black"
+          />
         </div>
         {isLoading ? (
           <span className="text-black">sending...</span>
         ) : (
           <div className="flex justify-center space-x-4 mt-6">
-            <button type={'submit'} className="bg-black text-white py-3 px-6 rounded-lg hover:bg-gray-700 shadow-lg transition duration-300">
+            <button
+              type="submit"
+              className="bg-sublime-light-turquoise text-white py-3 px-6 rounded-lg hover:bg-[#82c4c4] shadow-lg transition duration-300"
+            >
               로그인
             </button>
-            <Link to={'/signup'} className="bg-black text-white py-3 px-6 rounded-lg hover:bg-gray-700 shadow-lg transition duration-300">
+            <Link
+              to="/signup"
+              className="bg-sublime-dark-grey-blue text-white py-3 px-6 rounded-lg hover:bg-gray-500 shadow-lg transition duration-300"
+            >
               회원가입
             </Link>
           </div>
         )}
       </form>
-    </>
+    </div>
   );
-  
 };
+
+export default SigninInputForm;

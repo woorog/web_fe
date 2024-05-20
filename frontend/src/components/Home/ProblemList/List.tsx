@@ -15,29 +15,6 @@ const ListWrapper = styled.div`
   margin-top: 1rem;
 `;
 
-const ListTitle = styled.div`
-  font-weight: 500;
-  font-size: 2.2rem;
-  line-height: 2.9rem;
-  text-align: center;
-  position: absolute;
-  left: 3.5rem;
-  top: 3rem;
-  color: #555555;
-  cursor: pointer;
-`;
-
-const ProblemListWrapper = styled.div`
-  position: absolute;
-  top: 9.5rem;
-  display: grid;
-  grid-template-columns: 37rem 37rem;
-  grid-template-rows: 12.2rem 12.2rem 12.2rem;
-  column-gap: 3.5rem;
-  row-gap: 3.5rem;
-  width: fit-content;
-`;
-
 const List = () => {
   const [user] = useRecoilState(userState);
   const [problems, setProblems] = useState<ProblemInfo[]>([]);

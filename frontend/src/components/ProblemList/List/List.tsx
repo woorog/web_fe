@@ -36,7 +36,6 @@ const Info = styled.div`
 const List = ({ list }: ListType) => {
   const [filter] = useRecoilState(filterState);
 
-  // 선택된 문제를 가져오는 로직
   const selectedProblem = list.length > 0 ? list[0] : null; // 첫 번째 문제를 선택
 
   return (

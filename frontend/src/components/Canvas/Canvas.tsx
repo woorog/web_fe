@@ -1,6 +1,6 @@
 import { Tldraw, track, useEditor } from 'tldraw';
 import { VITE_SOCKET_CANVAS_URL } from '../../constants/env';
-import { useYjsStore } from './useYjsStore';
+import { useSyncStore } from './useSyncStore';
 import 'tldraw/tldraw.css';
 import './index.css';
 
@@ -11,7 +11,7 @@ interface CanvasProps {
 const HOST_URL = VITE_SOCKET_CANVAS_URL;
 
 export default function Canvas({ roomNumber }: CanvasProps) {
-	const store = useYjsStore({
+	const store = useSyncStore({
 		roomId: roomNumber,
 		hostUrl: HOST_URL,
 	});

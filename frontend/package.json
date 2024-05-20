@@ -23,6 +23,7 @@
     "codemirror": "^6.0.1",
     "jest-dom": "^4.0.0",
     "lib0": "^0.2.54",
+    "partysocket": "^1.0.1",
     "peer": "^0.6.1",
     "react": "^18.2.0",
     "react-beforeunload": "^2.5.3",

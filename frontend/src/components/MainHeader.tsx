@@ -1,50 +1,77 @@
-import { Link } from 'react-router-dom';
+// import { Link } from 'react-router-dom';
+// import { useRecoilState } from 'recoil';
+// import { userState } from '../recoils';
+// import React, { useCallback } from 'react';
+// import { useUserState } from '../hooks/useUserState';
+
+// export const MainHeader = () => {
+//   const [user, setUser] = useRecoilState(userState);
+//   const { logoutHandler } = useUserState();
+
+//   const handleLogoutClick = useCallback(() => {
+//     if (!user.isLoggedIn) {
+//       return;
+//     }
+//     logoutHandler();
+//   }, [user.isLoggedIn, logoutHandler]);
+
+//   return (
+//     <div className="flex items-center justify-between p-4 bg-sublime-dark-grey-blue">
+//       <Link to="/" className="text-7xl font-bold text-white">
+//         ONCORE
+//       </Link>
+//       <nav>
+//         <ul className="flex space-x-4">
+//         </ul>
+//       </nav>
+//       <div className="flex items-center space-x-2">
+//         {user.isLoggedIn ? (
+//           <span className="px-4 py-2 text-white text-2xl">{user.ID}</span>
+//         ) : (
+//           <Link to="/signup">
+//             <button type="button" className="px-4 py-2 text-white border border-white bg-sublime-dark-grey-blue hover:bg-gray-800 focus:outline-none transition-transform duration-300 ease-in-out transform hover:scale-105 text-xl">
+//               회원가입
+//             </button>
+//           </Link>
+//         )}
+//         {user.isLoggedIn && (
+//           <button type="button" onClick={handleLogoutClick} className="px-4 py-2 text-white border border-white bg-sublime-dark-grey-blue hover:bg-gray-800 focus:outline-none transition-transform duration-300 ease-in-out transform hover:scale-105 text-xl">
+//             로그아웃
+//           </button>
+//         )}
+//         {!user.isLoggedIn && (
+//           <Link to="/signin">
+//             <button type="button" className="px-4 py-2 text-white border border-white bg-sublime-dark-grey-blue hover:bg-gray-800 focus:outline-none transition-transform duration-300 ease-in-out transform hover:scale-105 text-xl">
+//               로그인
+//             </button>
+//           </Link>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
+
 import { useRecoilState } from 'recoil';
 import { userState } from '../recoils';
-import React, { useCallback } from 'react';
-import { useUserState } from '../hooks/useUserState';
+import logo from '../assets/TransparentBanner.png';
 
 export const MainHeader = () => {
-  const [user, setUser] = useRecoilState(userState);
-  const { logoutHandler } = useUserState();
-
-  const handleLogoutClick = useCallback(() => {
-    if (!user.isLoggedIn) {
-      return;
-    }
-    logoutHandler();
-  }, [user.isLoggedIn, logoutHandler]);
+  const [user] = useRecoilState(userState);
 
   return (
-    <div className="flex items-center justify-between p-4 bg-sublime-dark-grey-blue">
-      <Link to="/" className="text-7xl font-bold text-white">
-        ONCORE
-      </Link>
+    <div className="flex items-center justify-between p-4 bg-transparent">
+      <a href="/" className="flex items-center">
+        <img src={logo} alt="ONCORE Logo" className="h-[72px]" />
+      </a>
       <nav>
         <ul className="flex space-x-4">
         </ul>
       </nav>
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center space-x-4">
         {user.isLoggedIn ? (
-          <span className="px-4 py-2 text-white text-2xl">{user.ID}</span>
+          <span className="px-4 py-2 text-white text-2xl"> 안녕하세요, {user.ID} 님! </span>
         ) : (
-          <Link to="/signup">
-            <button type="button" className="px-4 py-2 text-white border border-white bg-sublime-dark-grey-blue hover:bg-gray-800 focus:outline-none transition-transform duration-300 ease-in-out transform hover:scale-105 text-xl">
-              회원가입
-            </button>
-          </Link>
-        )}
-        {user.isLoggedIn && (
-          <button type="button" onClick={handleLogoutClick} className="px-4 py-2 text-white border border-white bg-sublime-dark-grey-blue hover:bg-gray-800 focus:outline-none transition-transform duration-300 ease-in-out transform hover:scale-105 text-xl">
-            로그아웃
-          </button>
-        )}
-        {!user.isLoggedIn && (
-          <Link to="/signin">
-            <button type="button" className="px-4 py-2 text-white border border-white bg-sublime-dark-grey-blue hover:bg-gray-800 focus:outline-none transition-transform duration-300 ease-in-out transform hover:scale-105 text-xl">
-              로그인
-            </button>
-          </Link>
+          <span className="px-4 py-2 text-white text-2xl"></span>
         )}
       </div>
     </div>

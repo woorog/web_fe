@@ -1,10 +1,10 @@
-
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import io from 'socket.io-client';
 import { Peer } from 'peerjs';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { socketState } from '../../recoils';
+import { ReactMic } from 'react-mic';
 
 import { ReactComponent as Camera } from '../../assets/Camera.svg'; // SVG 아이콘 임포트
 import { ReactComponent as Pause } from '../../assets/Pause.svg'; // SVG 아이콘 임포트
@@ -35,56 +35,80 @@ export const Video = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const { roomNumber } = useParams();
   const [, setMyID] = useState('');
-  const [peers, setPeers] = useState<any>({});
+  const [peers, setPeers] = useState<{ [id: string]: MediaStream }>({});
   const [videoOn, setVideoOn] = useState(false);
   const [micOn, setMicOn] = useState(false);
   const [text, setText] = useState('');
   const [btnWork, setBtnWork] = useState(false);
   const peerVideosRef = useRef<Array<HTMLVideoElement>>([]);
   const navigate = useNavigate();
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
   const [myPeer, setMyPeer] = useState<Peer>();
   const [socket, setSocket] = useRecoilState(socketState);
 
   useEffect(() => {
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((mediaStream) => {
-      setVideoOn(true);
-      setMicOn(true);
-      setMyStream(mediaStream);
-      setMyPeer(new Peer());
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      .then((mediaStream) => {
+        console.log('getUserMedia success:', mediaStream);
+        setVideoOn(true);
+        setMicOn(true);
+        setMyStream(mediaStream);
+        setMyPeer(new Peer());
 
-      const socketUrl = import.meta.env.VITE_SOCKET_SERVER_URL;
+        const socketUrl = import.meta.env.VITE_SOCKET_SERVER_URL;
 
-      const newSocket = io(socketUrl, {
-        path: '/socket-video/',
-        secure: true,
-        reconnection: true,
-        reconnectionAttempts: 5,
-        reconnectionDelay: 1000,
+        const newSocket = io(socketUrl, {
+          // path: '/socket-video/',
+          // secure: true,
+          reconnection: true,
+          reconnectionAttempts: 5,
+          reconnectionDelay: 1000,
+        });
+
+        setSocket(newSocket);
+      })
+      .catch((error) => {
+        console.error('Error accessing media devices:', error);
+        alert('Error accessing media devices: ' + error.message);
       });
-
-      setSocket(newSocket);
-    }).catch((error) => {
-      console.error('Error accessing media devices:', error);
-    });
   }, []);
+
+  const handleMicData = (recordedBlob: any) => {
+    console.log('recordedBlob is: ', recordedBlob);
+    if (recordedBlob && recordedBlob.size > 0) {
+      console.log('recordedBlob size: ', recordedBlob.size);
+      if (micOn) {
+        setIsSpeaking(true);
+      }
+    } else {
+      console.log('recordedBlob size is 0 or undefined');
+      setIsSpeaking(false);
+    }
+  };
+
+  const handleMicStop = (recordedBlob: any) => {
+    console.log('Recorded Blob:', recordedBlob);
+  };
 
   const callCallback = useCallback(
     (call: any) => {
       call.answer(myStream);
-      call.on('stream', () => {
-        setPeers({
-          ...peers,
-          ...{
-            [call.peer]: call,
-          },
-        });
+      call.on('stream', (remoteStream: MediaStream) => {
+        setPeers((prevPeers: { [id: string]: MediaStream }) => ({
+          ...prevPeers,
+          [call.peer]: remoteStream,
+        }));
       });
       call.on('close', () => {
-        return;
+        setPeers((prevPeers: { [id: string]: MediaStream }) => {
+          const updatedPeers = { ...prevPeers };
+          delete updatedPeers[call.peer];
+          return updatedPeers;
+        });
       });
     },
-    [myStream, peers],
+    [myStream],
   );
 
   const connectCallback = useCallback(
@@ -93,35 +117,33 @@ export const Video = () => {
         return;
       }
       const call = myPeer.call(userId, myStream);
-      call.on('stream', () => {
-        setPeers({
-          ...peers,
-          ...{
-            [userId]: call,
-          },
-        });
+      call.on('stream', (remoteStream: MediaStream) => {
+        setPeers((prevPeers: { [id: string]: MediaStream }) => ({
+          ...prevPeers,
+          [userId]: remoteStream,
+        }));
       });
 
       call.on('close', () => {
-        return;
+        setPeers((prevPeers: { [id: string]: MediaStream }) => {
+          const updatedPeers = { ...prevPeers };
+          delete updatedPeers[userId];
+          return updatedPeers;
+        });
       });
     },
-    [myStream, peers, myPeer],
+    [myStream, myPeer],
   );
 
   const disconnectCallback = useCallback(
     (userId: string) => {
-      if (!peers[userId]) {
-        return;
-      }
-      peers[userId].close();
-      const temp = { ...peers };
-      delete temp[userId];
-      setPeers(temp);
-
-      
+      setPeers((prevPeers: { [id: string]: MediaStream }) => {
+        const updatedPeers = { ...prevPeers };
+        delete updatedPeers[userId];
+        return updatedPeers;
+      });
     },
-    [peers],
+    [],
   );
 
   useEffect(() => {
@@ -249,14 +271,25 @@ export const Video = () => {
     updateConstraints.audio = !micOn;
     setTimeoutText(`마이크 ${!micOn ? 'ON' : 'OFF'}`);
     setMicOn(!micOn);
+    if (!micOn) {
+      setIsSpeaking(false); // 마이크를 끌 때 isSpeaking을 false로 설정
+    }
     sendStream(updateConstraints);
   };
 
   return (
     <div className="mt-4 w-full min-h-36 flex flex-col justify-start items-center overflow-auto">
+      <ReactMic
+        record={micOn}
+        className="hidden"
+        onStop={handleMicStop}
+        onData={handleMicData}
+        strokeColor="#000000"
+        backgroundColor="#FF4081"
+      />
       {Object.entries(peers).map((user, idx) => (
         <video
-          className="max-w-48 w-full max-h-36 h-auto mb-4 bg-white rounded-lg"
+          className={`max-w-48 w-full max-h-36 h-auto mb-4 bg-white rounded-lg ${isSpeaking ? 'border-4 border-green-500' : ''}`}
           autoPlay
           playsInline
           ref={(ele) => {
@@ -269,7 +302,7 @@ export const Video = () => {
       ))}
       <div className="relative max-h-36 w-full h-auto flex flex-col items-center">
         <video
-          className="max-w-48 w-full max-h-36 h-auto mb-4 bg-white rounded-lg"
+          className={`max-w-48 w-full max-h-36 h-auto mb-4 bg-white rounded-lg ${isSpeaking ? 'border-4 border-green-500' : ''}`}
           ref={videoRef}
           autoPlay
           muted
@@ -284,7 +317,7 @@ export const Video = () => {
           </div>
         </div>
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-sm text-gray-600 text-center w-full">
-        {text}
+          {text}
         </div>
       </div>
     </div>

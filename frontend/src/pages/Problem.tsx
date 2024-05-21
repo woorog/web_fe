@@ -459,7 +459,8 @@ const Problem = () => {
 
       try {
         const response = await axios.post(pistonUrl, payload);
-        let result = `INPUT\n${inputText}\nOUTPUT\n${response.data.run.output}`
+        // let result = `INPUT\n${inputText}\nOUTPUT\n${response.data.run.output}`
+        let result = `${response.data.run.output}`
         if (resultRef.current) {
           resultRef.current.value = result;
         }

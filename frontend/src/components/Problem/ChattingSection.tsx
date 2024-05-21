@@ -14,9 +14,10 @@ import { VITE_CHAT_SOCKET_SERVER_URL } from '../../constants/env';
 
 interface ChattingSectionProps {
   roomNumber: string;
+  onNewMessage: () => void; // 새로운 콜백 프로퍼티 추가
 }
 
-const ChattingSection: React.FC<ChattingSectionProps> = ({ roomNumber }) => {
+const ChattingSection: React.FC<ChattingSectionProps> = ({ roomNumber,onNewMessage }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [allMessages, setAllMessage] = useState<MessageData[]>([]);
 
@@ -44,6 +45,9 @@ const ChattingSection: React.FC<ChattingSectionProps> = ({ roomNumber }) => {
     }
 
     setAllMessage((prev) => [...prev, recievedMessage]);
+
+    // 부모 컴포넌트에 알림
+    onNewMessage();
   };
 
   const handleChattingSocketError = (errorMessage: ErrorResponse) => {
@@ -113,3 +117,4 @@ const ChattingSection: React.FC<ChattingSectionProps> = ({ roomNumber }) => {
 }
 
 export default memo(ChattingSection);
+

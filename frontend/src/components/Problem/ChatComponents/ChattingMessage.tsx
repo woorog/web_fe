@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { MessageData } from './ChatTypes';
+import clova from '../../../assets/clova.png';
 
 interface ChattingMessageProps {
   messageData: MessageData;
@@ -20,9 +21,10 @@ function ChattingMessage({ messageData, isMyMessage }: ChattingMessageProps) {
   return (
     <div className={`flex flex-col gap-0.5 ${myMessage ? 'items-end' : 'items-start'}`}>
       <span className="mx-1 text-xs font-light">
-        {aiMessage ? 'Clova X (AI)' : messageData.nickname}
+        {aiMessage ? 'AI Response' : messageData.nickname}
       </span>
       <div className={`px-4 py-2 rounded-lg w-fit ${getMessageColor()}`}>
+        {aiMessage && <img src={clova} alt="Clova" className="w-40 h-12 mr-2" />}
         <span className="whitespace-pre-wrap">{messageData.message}</span>
       </div>
     </div>

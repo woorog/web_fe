@@ -1,8 +1,6 @@
 /* App.css */
 @import url('https://fonts.googleapis.com/css?family=Rubik:700&display=swap');
 
-
-
 .fade-enter {
     opacity: 0;
     transform: rotateY(90deg);
@@ -28,3 +26,57 @@
     -moz-user-select: text; /* For Firefox */
     -ms-user-select: text; /* For Internet Explorer and Edge */
   }
+
+@keyframes shake {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    10% { transform: translate(-1px, -2px) rotate(-1deg); }
+    20% { transform: translate(-3px, 0px) rotate(1deg); }
+    30% { transform: translate(3px, 2px) rotate(0deg); }
+    40% { transform: translate(1px, -1px) rotate(1deg); }
+    50% { transform: translate(-1px, 2px) rotate(-1deg); }
+    60% { transform: translate(-3px, 1px) rotate(0deg); }
+    70% { transform: translate(3px, 1px) rotate(-1deg); }
+    80% { transform: translate(-1px, -1px) rotate(1deg); }
+    90% { transform: translate(1px, 2px) rotate(0deg); }
+    100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+.animate-shake {
+    animation: shake 0.5s;
+    animation-iteration-count: infinite;
+    animation-delay: 1.5s; /* 2초 주기 중 1.5초 동안은 대기 */
+}
+
+.icon-container {
+    position: fixed;
+    bottom: calc(70vh + 1rem);
+    right: 0;
+    width: 3.5rem; /* 아이콘 전체 너비 */
+    height: 3.5rem; /* 아이콘 전체 높이 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out;
+    overflow: hidden; /* div 밖으로 나간 부분 숨기기 */
+}
+
+.icon-container:hover {
+    transform: translateX(-50%);
+}
+
+.icon {
+    transition: transform 0.3s ease-in-out, fill 0.3s ease-in-out;
+}
+
+.icon-fully-visible {
+    transform: scale(1);
+}
+
+.icon-partially-visible {
+    transform: scale(0.8);
+}
+
+.icon-orange {
+    fill: orange;
+}

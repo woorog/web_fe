@@ -1,10 +1,9 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { userState } from '../recoils';
-import { ProblemButtons } from '../components/Problem/Buttons';
 import PageButtons from '../components/Problem/Buttons/PageButtons';
 import { ProblemHeader } from '../components/ProblemHeader';
-import { ProblemContent, Result } from '../components/Problem';
+import { ProblemContent} from '../components/Problem';
 import { ProblemInfo } from '@types';
 import { useRecoilState } from 'recoil';
 import { editorState, gradingState } from '../recoils';
@@ -27,9 +26,12 @@ import Canvas from '../components/Canvas/Canvas';
 import axios from 'axios';
 import { io } from 'socket.io-client';
 import '../../App.css';
+import { ReactComponent as Comment } from '../assets/Comment.svg'; // SVG 아이콘 임포트
+import { ReactComponent as NewMessage } from '../assets/Message-dot.svg'; // 클로즈 아이콘 SVG 임포트
+import ChattingSection from '../components/Problem/ChattingSection'; // ChattingSection 임포트
 
 const URL = import.meta.env.VITE_SERVER_URL;
-const socketURL = import.meta.env.VITE_SOCKET_SERVER_URL;
+const socketURL = import.meta.env.VITE_SOCKET_RESULT_URL;
 const REM = getComputedStyle(document.documentElement).fontSize;
 const webRTCURL = import.meta.env.VITE_SOCKET_URL;
 
@@ -102,32 +104,38 @@ const styles = {
   editorBottom: {
     flex: '1',
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'row', // Align children horizontally
+    alignItems: 'stretch', // Stretch children to full height
     padding: '0.5rem',
     backgroundColor: 'white',
     borderRadius: '0.5rem',
     marginTop: '0.5rem',
+    height: '100%', // Ensure it takes full height
   },
   textArea: {
     flex: '1',
-    marginBottom: '0.5rem',
+    margin: '0 0.25rem', // Adjust margin for spacing
     padding: '0.5rem',
     border: '1px solid #ddd',
     borderRadius: '0.5rem',
+    height: '100%', // Set height to 100%
   },
   runButton: {
-    alignSelf: 'flex-end',
+    flex: '0 0 16.67%', // Adjust flex to occupy 2/12 of the parent width
+    margin: '0 0.25rem', // Adjust margin for spacing
     padding: '0.5rem 1rem',
     backgroundColor: '#007bff',
     color: 'white',
     borderRadius: '0.5rem',
     border: 'none',
     cursor: 'pointer',
+    height: '100%', // Set height to 100%
   },
   resultSectionVisible: {
     display: 'block',
   },
 };
+
 
 const whiteBackgroundTheme = EditorView.theme({
   "&": {
@@ -159,10 +167,10 @@ const Problem = () => {
   const editorRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const resultRef = useRef<HTMLTextAreaElement>(null);
-  
+  const [isRecievedMessage, setIsRecievedMessage] = useState(false);
   const socket = useMemo(() => {
     console.log('trying to connect');
-    const newSocket = io('https://oncore.site', {
+    const newSocket = io(socketURL, {
       path: '/socket-result/',
       reconnection: true,
       reconnectionAttempts: 5,
@@ -175,6 +183,8 @@ const Problem = () => {
   
     return newSocket;
   }, []);
+
+
 
   const handleToggleEditor = () => {
     setIsEditorVisible(true);
@@ -459,7 +469,6 @@ const Problem = () => {
 
       try {
         const response = await axios.post(pistonUrl, payload);
-        // let result = `INPUT\n${inputText}\nOUTPUT\n${response.data.run.output}`
         let result = `${response.data.run.output}`
         if (resultRef.current) {
           resultRef.current.value = result;
@@ -474,104 +483,123 @@ const Problem = () => {
     }
   };
 
-  const handleToggleResult = () => {
-    setIsResultVisible(!isResultVisible);
+  const handleNewMessage = () => {
+    if (!isResultVisible) {
+      // 채팅창이 열려 있지 않은 경우에만 업데이트
+      setIsRecievedMessage(true);
+    }
   };
 
+  const handleToggleChat = () => {
+    setIsResultVisible((prev) => !prev);
+    setIsRecievedMessage(false); // 채팅창이 열려 있으면 새로운 메시지가 와도 아이콘이 변경되지 않음
+  };
+
+
   return (
-    <div className="w-full h-screen mx-auto flex flex-col select-none">
-      <div className="w-full h-16 bg-sublime-dark-grey-blue box-border">
-        <ProblemHeader
-          URL={roomNumber ? `/problem/${version}/${id}/${roomNumber}` : `/problem/${version}/${id}`}
-          problemName={problem?.title ? problem.title : ''}
-          type={0}
-        />
-      </div>
-      <div className="flex-grow w-full flex flex-col bg-slate-200">
-        <div className="flex flex-row w-full h-full p-4 overflow-x-hidden overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400">
-          {version === 'multi' && (
-            <div className="relative w-1/6 h-full">
-              <div className="w-full mb-2">
-                <PageButtons />
-              </div>
-              <div className="w-full">
-                <Video />
-              </div>
-            </div>
-          )}
-          <div className="relative h-full flex flex-col px-4" style={{ width: `${leftWidth}%` }}>
-            <div className="flex w-full mb-2 space-x-2">
-              <EditorCanvasToggle
-                isVisible={isEditorVisible}
-                toggleVisibility={handleToggleEditor}
-                label="코드에디터"
-              />
-              <EditorCanvasToggle
-                isVisible={isCanvasVisible}
-                toggleVisibility={handleToggleCanvas}
-                label="화이트보드"
-              />
-            </div>
-            <div style={styles.flipCard}>
-              <div
-                style={{
-                  ...styles.flipCardInner,
-                  ...(isCanvasVisible ? styles.flipCardInnerFlipped : {}),
-                }}
-              >
-                <div style={styles.flipCardFrontBack} className="drop-shadow-lg rounded-lg">
-                  <div style={styles.editorContainer}>
-                    <div
-                      ref={editorRef}
-                      className="relative flex-grow select-text overflow-auto mt-2.5 rounded-lg"
-                      style={styles.editorTop}
-                    >
-                      {eView && (
-                        <LanguageSelector onClickModalElement={handleChangeEditorLanguage} />
-                      )}
-                    </div>
-                    <div style={styles.editorBottom}>
-                      <textarea
-                        ref={inputRef}
-                        style={styles.textArea}
-                        placeholder="Input"
-                      />
-                      <textarea
-                        ref={resultRef}
-                        style={styles.textArea}
-                        placeholder="Result"
-                        disabled
-                      />
-                      <button style={styles.runButton} onClick={handleRunCode}>
-                        Run
-                      </button>
-                    </div>
+      <div className="w-full h-screen mx-auto flex flex-col select-none">
+        <div className="w-full h-16 bg-sublime-dark-grey-blue box-border">
+          <ProblemHeader
+              URL={roomNumber ? `/problem/${version}/${id}/${roomNumber}` : `/problem/${version}/${id}`}
+              problemName={problem?.title ? problem.title : ''}
+              type={0}
+          />
+        </div>
+        <div className="flex-grow w-full flex flex-col bg-slate-200">
+          <div
+              className="flex flex-row w-full h-full p-4 overflow-x-hidden overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400">
+            {version === 'multi' && (
+                <div className="relative w-1/6 h-full">
+                  <div className="w-full mb-2">
+                    <PageButtons/>
+                  </div>
+                  <div className="w-full">
+                    <Video/>
                   </div>
                 </div>
-                <div style={{ ...styles.flipCardFrontBack, ...styles.flipCardBack, padding: '0.5rem' }}>
-                  <Canvas roomNumber={roomNumber} />
+            )}
+            <div className="relative h-full flex flex-col px-4" style={{width: `${leftWidth}%`}}>
+              <div className="flex w-full mb-2 space-x-2">
+                <EditorCanvasToggle
+                    isVisible={isEditorVisible}
+                    toggleVisibility={handleToggleEditor}
+                    label="코드에디터"
+                />
+                <EditorCanvasToggle
+                    isVisible={isCanvasVisible}
+                    toggleVisibility={handleToggleCanvas}
+                    label="화이트보드"
+                />
+              </div>
+              <div style={styles.flipCard}>
+                <div
+                    style={{
+                      ...styles.flipCardInner,
+                      ...(isCanvasVisible ? styles.flipCardInnerFlipped : {}),
+                    }}
+                >
+                  <div style={styles.flipCardFrontBack} className="drop-shadow-lg rounded-lg">
+                    <div style={styles.editorContainer}>
+                      <div
+                        ref={editorRef}
+                        className="relative flex-grow select-text overflow-auto mt-2.5 rounded-lg"
+                        style={styles.editorTop}
+                      >
+                        {eView && (
+                          <LanguageSelector onClickModalElement={handleChangeEditorLanguage} />
+                        )}
+                      </div>
+                      <div style={styles.editorBottom}>
+                        <textarea
+                          ref={inputRef}
+                          style={{ ...styles.textArea, flexBasis: '33.33%' }}
+                          placeholder="Input"
+                        />
+                        <textarea
+                          ref={resultRef}
+                          style={{ ...styles.textArea, flexBasis: '50%', backgroundColor: 'rgb(209 213 219)' }} // Tailwind's grey-300
+                          placeholder="Result"
+                          disabled
+                        />
+                        <button
+                          style={styles.runButton}
+                          onClick={handleRunCode}
+                        >
+                          Run
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{...styles.flipCardFrontBack, ...styles.flipCardBack, padding: '0.5rem'}}>
+                    <Canvas roomNumber={roomNumber}/>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div className="flex-grow h-full flex flex-col min-w-1/4" style={{ width: `${100 - leftWidth}%` }}>
-            {problem && <ProblemContent problem={problem} />}
+            <div className="flex-grow h-full flex flex-col min-w-1/4" style={{width: `${100 - leftWidth}%`}}>
+              {problem && <ProblemContent problem={problem}/>}
+            </div>
           </div>
         </div>
+
+        <div
+            className={`icon-container ${isResultVisible ? 'icon-partially-visible' : (isRecievedMessage ? 'icon-fully-visible' : 'icon-partially-visible')}`}
+            onClick={handleToggleChat}
+        >
+          {isResultVisible ? <Comment className="icon"/> : (isRecievedMessage ?
+              <NewMessage className="icon icon-orange"/> :
+              <Comment className="icon"/>)}
+        </div>
+
+        <div
+            className={`fixed bottom-4 right-4 bg-white border border-gray-200 rounded-lg p-4 shadow-lg overflow-y-auto ${
+                isResultVisible ? 'block' : 'hidden'
+            }`}
+            style={{width: '41.666667%', height: '70vh'}}
+        >
+          <ChattingSection roomNumber={roomNumber} onNewMessage={handleNewMessage}/>
+        </div>
       </div>
-      <div 
-        className="fixed bottom-1/2 right-4 bg-blue-500 text-white rounded-full w-14 h-14 flex justify-center items-center cursor-pointer shadow-lg z-10"
-        onClick={handleToggleResult}
-      >
-        {isResultVisible ? 'X' : 'R'}
-      </div>
-      <div
-        className={`fixed bottom-4 right-4 bg-white border border-gray-200 rounded-lg p-4 shadow-lg overflow-y-auto ${isResultVisible ? 'block' : 'hidden'}`}
-        style={{ width: '41.666667%', height: '50vh' }}
-      >
-        <Result roomNumber={roomNumber} />
-      </div>
-    </div>
   );
 };
 

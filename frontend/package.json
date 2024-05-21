@@ -21,6 +21,7 @@
     "axios": "^1.6.8",
     "base-64": "^1.0.0",
     "codemirror": "^6.0.1",
+    "framer-motion": "^11.2.4",
     "jest-dom": "^4.0.0",
     "lib0": "^0.2.54",
     "partysocket": "^1.0.1",

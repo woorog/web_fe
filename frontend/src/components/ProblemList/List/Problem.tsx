@@ -12,100 +12,55 @@ type ProblemProps = {
 };
 
 const Problem = ({ problemId }: ProblemProps) => {
-  const {
-    roomUrl,
-    setRoomUrl,
-    currentIndex,
-    fade,
-    user,
-    showSignup,
-    isLoggedIn,
-    setIsLoggedIn,
-    handleCreateRoom,
-    handleJoinRoom,
-    handleLogoutClick,
-    handleSignupClick,
-  } = useProblemState(problemId);
+  const navigate = useNavigate();
+  const [roomUrl, setRoomUrl] = useState('');
 
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [welcomeVisible, setWelcomeVisible] = useState(false);
-  const signinControls = useAnimation();
-  const readyControls = useAnimation();
-
-  useEffect(() => {
-    if (user.isLoggedIn) {
-      setIsLoggedIn(true);
-      readyControls.start({ opacity: 1, y: 0 });
-    }
-  }, [user.isLoggedIn, setIsLoggedIn, readyControls]);
-
-  const handleLoginSuccessWithAnimation = async () => {
-    setIsAnimating(true);
-    setWelcomeVisible(true);
-    await signinControls.start({ opacity: 0, y: 50, transition: { duration: 1 } });
-    await new Promise(resolve => setTimeout(resolve, 2000)); // 2초 대기
-    setWelcomeVisible(false);
-    setIsLoggedIn(true);
-    readyControls.start({ opacity: 1, y: 0, transition: { duration: 1 } });
-    setIsAnimating(false);
+  const handleCreateRoom = () => {
+    const room = btoa(uuid());
+    localStorage.setItem(`problem${problemId}`, room);
+    navigate(`/problem/multi/${problemId}/${room}`);
   };
 
-  const formVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: { opacity: 1, y: 0, transition: { duration: 1, type: 'spring' } },
+  const handleJoinRoom = () => {
+    if (roomUrl) {
+      if (/^https?:\/\//.test(roomUrl)) {
+        window.location.href = roomUrl;
+      } else {
+        navigate(roomUrl);
+      }
+    } else {
+      alert('Please enter a valid room URL');
+    }
   };
 
   return (
-    <div className="relative z-10 flex flex-col items-center justify-center w-full min-h-screen bg-transparent text-white" style={{ marginTop: '-120px' }}>
-      <TextComponent fade={fade} currentIndex={currentIndex} showSignup={showSignup} />
-      {welcomeVisible && <Welcome />}
-      {isLoggedIn && !isAnimating && !welcomeVisible && (
-        <motion.div
-          className="flex flex-col items-center w-full max-w-screen-md mt-1" // Adjusted space between elements
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, type: 'spring' }}
-        >
-          <ReadyForm
-            roomUrl={roomUrl}
-            setRoomUrl={setRoomUrl}
-            handleJoinRoom={handleJoinRoom}
-            handleCreateRoom={handleCreateRoom}
-            handleLogoutClick={handleLogoutClick}
+    <div className="flex flex-col items-center justify-center w-full h-full">
+      <div className="flex flex-col items-center justify-center w-full max-w-4xl px-8 py-10 bg-white bg-opacity-80 shadow-lg rounded-xl">
+        <div className="w-full">
+          <input
+            type="text"
+            placeholder="방 URL을 입력해 참가하세요"
+            value={roomUrl}
+            onChange={(e) => setRoomUrl(e.target.value)}
+            className="w-full h-12 p-2 text-base sm:text-lg border-2 border-gray-300 rounded-lg focus:border-blue-500 text-black bg-white"
           />
-        </motion.div>
-      )}
-      {!isLoggedIn && !isAnimating && !showSignup && (
-        <motion.div
-          className="flex items-center justify-center w-full max-w-screen-lg" // Adjusted space between elements
-          initial="hidden"
-          animate="visible"
-          variants={formVariants}
-        >
-          <motion.div
-            className="flex flex-col items-center justify-center w-full sm:w-3/5 max-w-screen-md" // Adjusted space between elements
-            initial="hidden"
-            animate="visible"
-            variants={formVariants}
-          >
-            <SigninInputForm onSignupClick={handleSignupClick} onLoginSuccess={handleLoginSuccessWithAnimation} />
-          </motion.div>
-        </motion.div>
-      )}
-      {showSignup && (
-        <div className="flex items-center justify-center w-full max-w-screen-lg space-y-1">
-          <motion.div
-            className="flex flex-col items-center justify-center w-full sm:w-3/5 max-w-screen-md" // Adjusted space between elements
-            initial="hidden"
-            animate="visible"
-            variants={formVariants}
-          >
-            <SignupInputForm />
-          </motion.div>
         </div>
-      )}
+        <div className="flex flex-col items-center justify-center w-full mt-5 space-y-5">
+          <button
+            onClick={handleJoinRoom}
+            className="w-1/2 h-12 text-base sm:text-lg font-bold text-white bg-sublime-light-turquoise rounded-lg hover:bg-[#82c4c4] shadow-lg transition duration-300"
+          >
+            방 참가하기
+          </button>
+          <button
+            onClick={handleCreateRoom}
+            className="w-1/2 h-12 text-base sm:text-lg font-bold text-white bg-sublime-dark-grey-blue rounded-lg hover:bg-gray-500 shadow-lg transition duration-300"
+          >
+            방 만들기
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
-
-export default React.memo(Problem);
+export default memo(Problem);

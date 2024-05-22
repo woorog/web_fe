@@ -53,16 +53,18 @@
 
 import { useRecoilState } from 'recoil';
 import { userState } from '../recoils';
+import { useCallback } from 'react';
+import { useUserState } from '../hooks/useUserState';
 import logo from '../assets/TransparentBanner.png';
 
 export const MainHeader = () => {
   const [user] = useRecoilState(userState);
 
   return (
-    <div className="flex items-center justify-between p-4 bg-transparent">
-      <a href="/" className="flex items-center">
-        <img src={logo} alt="ONCORE Logo" className="h-[72px]" />
-      </a>
+    <div className="flex items-center justify-between p-2 bg-transparent">
+      <Link to="/" className="text-7xl font-bold text-white">
+        <img src={logo} alt="ONCORE" className="h-24" />
+      </Link>
       <nav>
         <ul className="flex space-x-4">
         </ul>

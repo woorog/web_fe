@@ -3,6 +3,7 @@ import { useRecoilState } from 'recoil';
 import { userState } from '../recoils';
 import React, { useCallback } from 'react';
 import { useUserState } from '../hooks/useUserState';
+import logo from '../assets/TransparentBanner.png';
 
 interface propsType {
   URL: string;
@@ -26,8 +27,11 @@ export const ProblemHeader = ({ URL, problemName, type }: propsType) => {
 
   return (
     <div className="box-border w-full px-24 h-full flex justify-between items-center">
-      <Link to={'/'} className="text-white font-bold text-2xl cursor-pointer no-underline">
+      {/* <Link to={'/'} className="text-white font-bold text-2xl cursor-pointer no-underline">
         ONCORE
+      </Link> */}
+      <Link to="/" className="text-7xl font-bold text-white">
+        <img src={logo} alt="ONCORE" className="h-16" />
       </Link>
       <div className="flex justify-center items-center h-full">
         <div className="flex gap-4">

@@ -322,7 +322,7 @@ export const SignupInputForm = () => {
             />
             <button
               type="button"
-              className="relative ml-2 px-5 py-3 bg-black text-white text-sm rounded-lg border-2 border-white transition duration-300"
+              className="ml-2 px-6 py-3 bg-sublime-dark-grey-blue text-white rounded-lg hover:bg-gray-500 transition duration-300 text-xl"
               onClick={handleIdCheck}
               style={{
                 borderColor: '#ffffff', // 흰색 테두리
@@ -372,7 +372,7 @@ export const SignupInputForm = () => {
         <div className="flex justify-between mt-4 space-x-4">
           <button
             type="reset"
-            className="relative bg-black text-white py-3 px-6 rounded-lg border-2 border-white transition duration-300"
+            className="px-6 py-3 bg-sublime-dark-grey-blue text-white rounded-lg hover:bg-gray-500 transition duration-300 text-xl"
             onClick={handleClear}
             style={{
               borderColor: '#ffffff', // 흰색 테두리
@@ -386,13 +386,7 @@ export const SignupInputForm = () => {
           </button>
           <button
             type="submit"
-            className="relative bg-black text-white py-3 px-6 rounded-lg border-2 border-white transition duration-300"
-            style={{
-              borderColor: '#ffffff', // 흰색 테두리
-              backgroundColor: 'transparent', // 배경 투명화
-              transition: 'box-shadow 0.3s ease-in-out',
-              boxShadow: '0 0 2px #ffffff', // 기본 그림자 효과
-            }}
+            className="px-6 py-3 bg-sublime-light-turquoise text-white rounded-lg hover:bg-[#82c4c4] transition duration-300 text-xl"
           >
             회원가입
             <span className="absolute inset-0 rounded-lg border border-transparent transition-all duration-300 hover:border-white hover:shadow-outline" style={{ boxShadow: '0 0 10px #ffffff' }}></span>

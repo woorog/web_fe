@@ -83,12 +83,8 @@
 
 
 import React, { useCallback, useMemo, useState, useRef } from 'react';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useUserState } from '../../hooks/useUserState';
-
-type SigninInputFormProps = {
-  onSignupClick: () => void;
-  onLoginSuccess: () => void;
-};
 
 export const SigninInputForm = ({ onSignupClick, onLoginSuccess }: SigninInputFormProps) => {
   const [isLoading, setLoading] = useState(false);
@@ -131,44 +127,42 @@ export const SigninInputForm = ({ onSignupClick, onLoginSuccess }: SigninInputFo
   );
 
   return (
-    <>
-      <div className="p-4 text-xl font-bold"></div>
-      <form onSubmit={handleSubmit} className="space-y-4 text-xl font-bold p-6 rounded-lg" style={{ backgroundColor: '#303841' }}>
+    <div className="flex flex-col items-center justify-center w-full max-w-4xl px-8 py-10 bg-white bg-opacity-80 shadow-lg rounded-xl">
+      <div className="p-4 text-xl font-bold">
+      </div>
+      <form onSubmit={handleSubmit} className="w-full space-y-6 text-xl font-bold">
         <div className="flex flex-col">
-          <label htmlFor={'id'} className="text-white">아이디</label>
-          <input type={'text'} ref={id} id={'id'} className="mt-1 p-2 border rounded text-black" />
+          <label htmlFor="id" className="text-black">아이디</label>
+          <input
+            type="text"
+            ref={id}
+            id="id"
+            className="mt-1 p-2 border rounded text-black"
+          />
         </div>
         <div className="flex flex-col">
-          <label htmlFor={'password'} className="text-white">비밀번호</label>
-          <input type={'password'} ref={password} id={'password'} className="mt-1 p-2 border rounded text-black" />
+          <label htmlFor="password" className="text-black">비밀번호</label>
+          <input
+            type="password"
+            ref={password}
+            id="password"
+            className="mt-1 p-2 border rounded text-black"
+          />
         </div>
         {isLoading ? (
           <span className="text-white">login...</span>
         ) : (
           <div className="flex justify-center space-x-4 mt-6">
             <button
-              type={'submit'}
-              className="relative bg-black text-white py-3 px-6 rounded-lg border-2 border-white transition duration-300"
-              style={{
-                borderColor: '#ffffff', // 흰색 테두리
-                backgroundColor: 'transparent', // 배경 투명화
-                transition: 'box-shadow 0.3s ease-in-out',
-                boxShadow: '0 0 2px #ffffff', // 기본 그림자 효과
-              }}
+              type="submit"
+              className="bg-sublime-light-turquoise text-white py-3 px-6 rounded-lg hover:bg-[#82c4c4] shadow-lg transition duration-300"
             >
               로그인
               <span className="absolute inset-0 rounded-lg border border-transparent transition-all duration-300 hover:border-white hover:shadow-outline" style={{ boxShadow: '0 0 10px #ffffff' }}></span>
             </button>
-            <button
-              type="button"
-              onClick={onSignupClick}
-              className="relative bg-black text-white py-3 px-6 rounded-lg border-2 border-white transition duration-300"
-              style={{
-                borderColor: '#ffffff', // 흰색 테두리
-                backgroundColor: 'transparent', // 배경 투명화
-                transition: 'box-shadow 0.3s ease-in-out',
-                boxShadow: '0 0 2px #ffffff', // 기본 그림자 효과
-              }}
+            <Link
+              to="/signup"
+              className="bg-sublime-dark-grey-blue text-white py-3 px-6 rounded-lg hover:bg-gray-500 shadow-lg transition duration-300"
             >
               회원가입
               <span className="absolute inset-0 rounded-lg border border-transparent transition-all duration-300 hover:border-white hover:shadow-outline" style={{ boxShadow: '0 0 10px #ffffff' }}></span>
@@ -176,6 +170,8 @@ export const SigninInputForm = ({ onSignupClick, onLoginSuccess }: SigninInputFo
           </div>
         )}
       </form>
-    </>
-  );  
+    </div>
+  );
 };
+
+export default SigninInputForm;

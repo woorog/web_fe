@@ -25,7 +25,7 @@ interface ToggleMessageTypeProps {
               htmlFor="bordered-radio-1"
               className="w-full py-1 ms-2 text-sm font-medium text-neutral-950 dark:text-neutral-950"
             >
-              Peer
+              유저
             </label>
           </div>
           <div className="flex items-center ps-4 pr-4">
@@ -42,7 +42,7 @@ interface ToggleMessageTypeProps {
               htmlFor="bordered-radio-2"
               className="w-full py-1 ms-2 text-sm font-medium text-neutral-950 dark:text-neutral-950"
             >
-              CLOVA AI
+              AI
             </label>
           </div>
         </div>

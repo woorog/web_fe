@@ -1,9 +1,15 @@
+
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import io from 'socket.io-client';
 import { Peer } from 'peerjs';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { socketState } from '../../recoils';
+
+import { ReactComponent as Camera } from '../../assets/Camera.svg'; // SVG 아이콘 임포트
+import { ReactComponent as Pause } from '../../assets/Pause.svg'; // SVG 아이콘 임포트
+import { ReactComponent as Volume } from '../../assets/Volume.svg'; // SVG 아이콘 임포트
+import { ReactComponent as VolumeSlash } from '../../assets/VolumeSlash.svg'; // SVG 아이콘 임포트
 
 type ConstraintsType = {
   audio?: boolean;
@@ -253,7 +259,7 @@ export const Video = () => {
     <div className="mt-4 w-full min-h-36 flex flex-col justify-start items-center overflow-auto">
       {Object.entries(peers).map((user, idx) => (
         <video
-          className="max-w-48 w-full max-h-36 h-auto mb-4 bg-white"
+          className="max-w-48 w-full max-h-36 h-auto mb-4 bg-white rounded-lg"
           autoPlay
           playsInline
           ref={(ele) => {
@@ -266,28 +272,22 @@ export const Video = () => {
       ))}
       <div className="relative max-h-36 w-full h-auto flex flex-col items-center">
         <video
-          className="max-w-48 w-full max-h-36 h-auto mb-4 bg-white"
+          className="max-w-48 w-full max-h-36 h-auto mb-4 bg-white rounded-lg"
           ref={videoRef}
           autoPlay
           muted
           playsInline
         />
-        <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex gap-2">
-          <div
-            className="cursor-pointer text-base text-center z-10"
-            onClick={handleMicButton}
-          >
-            {micOn ? '🔊' : '🔔'}
+        <div className="absolute bottom-5 left-1/2 transform -translate-x-1/2 flex gap-2">
+          <div className="cursor-pointer text-base text-center z-10" onClick={handleMicButton}>
+            {micOn ? <Volume className="w-5 h-5"/> : <VolumeSlash className="w-5 h-5"/>}
           </div>
-          <div
-            className="cursor-pointer text-base text-center z-10"
-            onClick={handleCameraButton}
-          >
-            {!videoOn ? '📸' : '🟥'}
+          <div className="cursor-pointer text-base text-center z-10" onClick={handleCameraButton}>
+            {!videoOn ? <Camera className="w-5 h-5"/> : <Pause className="w-5 h-5"/>}
           </div>
         </div>
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-sm text-gray-600 text-center w-full">
-          {text}
+        {text}
         </div>
       </div>
     </div>

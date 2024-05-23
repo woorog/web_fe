@@ -101,7 +101,7 @@
 <web_fe/backend>
 MYSQL_DATABASE=userdb
 MYSQL_HOST=localhost
-MYSQL_PASSWORD=skrwl1
+MYSQL_PASSWORD=yours
 MYSQL_PORT=3308
 MYSQL_USERNAME=hello
 SERVERLESS_GRADE_JAVASCRIPT=
@@ -119,25 +119,25 @@ VITE_CHAT_SOCKET_SERVER_URL="ws://127.0.0.1:8888/"
 VITE_SOCKET_CANVAS_URL="ws://127.0.0.1:5555/"
 
 <web_fe/chat>
-# common
+?# common (? 빼세요)
 NODE_ENV=dev
 PORT=8888
 
-# cors
+?# cors
 ALLOWED_ORIGIN=*
 EXPOSE_HEADER=
 
-# redis
+?# redis
 REDIS_PORT=6379
 REDIS_HOST=localhost
 REDIS_PASSWORD=
 CACHE_TTL=300
 
-# mongo
+?# mongo
 MONGO_DEV=mongodb://localhost:27017/admin
 MONGO_PROD=mongodb://localhost:27017/admin
 
-# clova
+?# clova
 LLM_URL=yours
 
 

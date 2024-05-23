@@ -44,21 +44,21 @@
 .animate-shake {
     animation: shake 0.5s;
     animation-iteration-count: infinite;
-    animation-delay: 1.5s; /* 2초 주기 중 1.5초 동안은 대기 */
+    animation-delay: 1.5s; /* 2ì´ˆ ì£¼ê¸° ì¤‘ 1.5ì´ˆ ë™ì•ˆì€ ëŒ€ê¸° */
 }
 
 .icon-container {
     position: fixed;
     bottom: calc(70vh + 1rem);
     right: 0;
-    width: 3.5rem; /* 아이콘 전체 너비 */
-    height: 3.5rem; /* 아이콘 전체 높이 */
+    width: 3.5rem; /* ì•„ì´ì½˜ ì „ì²´ ë„ˆë¹„ */
+    height: 3.5rem; /* ì•„ì´ì½˜ ì „ì²´ ë†’ì´ */
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
     transition: transform 0.3s ease-in-out;
-    overflow: hidden; /* div 밖으로 나간 부분 숨기기 */
+    overflow: hidden; /* div ë°–ìœ¼ë¡œ ë‚˜ê°„ ë¶€ë¶„ ìˆ¨ê¸°ê¸° */
 }
 
 .icon-container:hover {
@@ -77,6 +77,55 @@
     transform: scale(0.8);
 }
 
+.icon-white {
+    fill: white;
+}
+
 .icon-orange {
     fill: orange;
+}
+
+
+
+
+.cm-function {
+    color: #268bd2;
+}
+
+.cm-keyword {
+    color: #859900;
+    font-weight: bold;
+}
+
+.cm-variableName {
+    color: #b58900;
+}
+
+.cm-string {
+    color: #2aa198;
+}
+
+.cm-comment {
+    color: #93a1a1;
+    font-style: italic;
+}
+
+.cm-number {
+    color: #d33682;
+}
+
+.cm-boolean {
+    color: #cb4b16;
+}
+
+.cm-className {
+    color: #268bd2;
+}
+
+.cm-attributeName {
+    color: #6c71c4;
+}
+
+.cm-content {
+    letter-spacing: 0.06em;
 }

@@ -75,7 +75,7 @@ export default function ChattingInput({ messageType, setMessageType, postingAi, 
           type="button"
           onClick={handleMessageSend}
           className={`font-normal rounded-e-lg whitespace-nowrap w-16 flex items-center justify-center h-full ${
-            messageType === 'ai' ? 'bg-lime-500 text-black' : 'bg-blue-300 text-black'
+            messageType === 'ai' ? 'bg-lime-500 text-white' : 'bg-blue-300 text-black'
           }`}
           disabled={(messageType === 'ai' && postingAi)}
         >

@@ -12,7 +12,7 @@ function ChattingMessage({ messageData, isMyMessage }: ChattingMessageProps) {
   const myMessage = !aiMessage && isMyMessage;
 
   const getMessageColor = () => {
-    if (aiMessage) return 'bg-lime-300 text-black';
+    if (aiMessage) return 'bg-lime-500 text-white';
     if (myMessage) return 'bg-blue-100';
 
     return 'bg-yellow-100';

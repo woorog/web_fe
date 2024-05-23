@@ -27,9 +27,6 @@ export const ProblemHeader = ({ URL, problemName, type }: propsType) => {
 
   return (
     <div className="box-border w-full px-24 h-full flex justify-between items-center">
-      {/* <Link to={'/'} className="text-white font-bold text-2xl cursor-pointer no-underline">
-        ONCORE
-      </Link> */}
       <Link to="/" className="text-7xl font-bold text-white">
         <img src={logo} alt="ONCORE" className="h-16" />
       </Link>
@@ -38,7 +35,7 @@ export const ProblemHeader = ({ URL, problemName, type }: propsType) => {
           <div className="text-white font-medium text-sm px-5 py-2.5">
             {user.ID}
           </div>
-          <Link to={user.isLoggedIn ? '' : '/signin'}>
+          {/* <Link to={user.isLoggedIn ? '' : '/signin'}>
             <button
               type="button"
               onClick={handleLogoutClick}
@@ -46,7 +43,7 @@ export const ProblemHeader = ({ URL, problemName, type }: propsType) => {
             >
               {user.isLoggedIn ? '로그아웃' : '로그인'}
             </button>
-          </Link>
+          </Link> */}
         </div>
       </div>
     </div>

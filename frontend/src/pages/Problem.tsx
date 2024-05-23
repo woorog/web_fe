@@ -30,6 +30,7 @@ import { ReactComponent as Comment } from '../assets/Comment.svg'; // SVG 아이
 import { ReactComponent as NewMessage } from '../assets/Message-dot.svg'; // 클로즈 아이콘 SVG 임포트
 import ChattingSection from '../components/Problem/ChattingSection'; // ChattingSection 임포트
 
+
 const URL = import.meta.env.VITE_SERVER_URL;
 const socketURL = import.meta.env.VITE_SOCKET_RESULT_URL;
 const REM = getComputedStyle(document.documentElement).fontSize;
@@ -93,6 +94,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     height: '100%',
+    position: 'relative',
   },
   editorTop: {
     flex: '2',
@@ -100,36 +102,40 @@ const styles = {
     padding: '0.5rem',
     backgroundColor: 'white',
     borderRadius: '0.5rem',
+    position: 'relative',
   },
   editorBottom: {
     flex: '1',
     display: 'flex',
-    flexDirection: 'row', // Align children horizontally
-    alignItems: 'stretch', // Stretch children to full height
+    flexDirection: 'row',
+    alignItems: 'stretch',
     padding: '0.5rem',
     backgroundColor: 'white',
     borderRadius: '0.5rem',
     marginTop: '0.5rem',
-    height: '100%', // Ensure it takes full height
+    height: '100%',
+  },
+  inputButtonWrapper: {
+    flexBasis: '33.33%',
+    display: 'flex',
+    flexDirection: 'column',
   },
   textArea: {
     flex: '1',
-    margin: '0 0.25rem', // Adjust margin for spacing
+    margin: '0 0.25rem',
     padding: '0.5rem',
     border: '1px solid #ddd',
     borderRadius: '0.5rem',
-    height: '100%', // Set height to 100%
+    height: '100%',
   },
   runButton: {
-    flex: '0 0 16.67%', // Adjust flex to occupy 2/12 of the parent width
-    margin: '0 0.25rem', // Adjust margin for spacing
-    padding: '0.5rem 1rem',
-    backgroundColor: '#007bff',
+    padding: '0.5rem',
+    backgroundColor: '#303841',
     color: 'white',
     borderRadius: '0.5rem',
     border: 'none',
     cursor: 'pointer',
-    height: '100%', // Set height to 100%
+    marginTop: '0.5rem',
   },
   resultSectionVisible: {
     display: 'block',
@@ -137,16 +143,20 @@ const styles = {
 };
 
 
-const whiteBackgroundTheme = EditorView.theme({
+const combinedTheme = EditorView.theme({
+  ".cm-content": {
+    letterSpacing: "0.06em" // 글자 간 간격 설정
+  },
   "&": {
     backgroundColor: "white",
   }
 }, { dark: false });
 
+
 const Problem = () => {
   useUserState();
 
-  const [leftWidth, setLeftWidth] = useState(50); // 초기 왼쪽 패널 너비 (퍼센트)
+  const [leftWidth, setLeftWidth] = useState(55); // 초기 왼쪽 패널 너비 (퍼센트)
   const [isEditorVisible, setIsEditorVisible] = useState(true);
   const [isCanvasVisible, setIsCanvasVisible] = useState(false);
   const [isResultVisible, setIsResultVisible] = useState(false);
@@ -169,18 +179,13 @@ const Problem = () => {
   const resultRef = useRef<HTMLTextAreaElement>(null);
   const [isRecievedMessage, setIsRecievedMessage] = useState(false);
   const socket = useMemo(() => {
-    console.log('trying to connect');
     const newSocket = io(socketURL, {
       path: '/socket-result/',
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
     });
-  
-    newSocket.on('connect', () => {
-      console.log('Socket connected successfully');
-    });
-  
+
     return newSocket;
   }, []);
 
@@ -215,6 +220,7 @@ const Problem = () => {
     () => editorColors[random.uint32() % editorColors.length],
     [],
   );
+
 
   useEffect(() => {
     let lang = '';
@@ -293,21 +299,22 @@ const Problem = () => {
         color: userColor.color,
         colorLight: userColor.light,
       });
-  
+
     const languageExtension = languageCompartment.of(langs['JavaScript']);
-  
+
     const extensions = [
       basicSetup,
       keymap.of([indentWithTab]),
       languageExtension,
-      whiteBackgroundTheme,
+      combinedTheme,
+      // syntaxHighlighting(myHighlightStyle),
       EditorView.updateListener.of(function (e) {
         setText(e.state.doc.toString());
       }),
     ];
     provider &&
       extensions.push(yCollab(ytext, provider.awareness, { undoManager }));
-  
+
     const state = EditorState.create({
       doc: ytext.toString(),
       extensions,
@@ -449,23 +456,39 @@ const Problem = () => {
     if (eView) {
       const versionMap: { [key: string]: string } = {
         python: '3.10.0',
-        javaScript: '18.15.0',
+        javascript: '18.15.0',
       };
       const pistonUrl = 'https://emkc.org/api/v2/piston/execute'
       const language = (code.language).toString().toLowerCase();
       const version = versionMap[language];
       const codeContent = eView.state.doc.toString();
       const inputText = inputRef.current ? inputRef.current.value : '';
-      const payload = {
-        language: language,
-        version: version,
-        files: [
-          {
-              content: codeContent,
-          },
-        ],
-        stdin: inputText,
-      };
+      let payload = {};
+      if(language == 'python') {
+        payload = {
+          language: language,
+          version: version,
+          files: [
+            {
+                content: codeContent,
+            },
+          ],
+          stdin: inputText,
+        };
+      } else {
+        payload = {
+          language: language,
+          version: version,
+          files: [
+            {
+                name: 'index.js',
+                content: codeContent,
+            },
+          ],
+          stdin: inputText,
+          args: [],
+        };
+      }
 
       try {
         const response = await axios.post(pistonUrl, payload);
@@ -497,69 +520,64 @@ const Problem = () => {
 
 
   return (
-      <div className="w-full h-screen mx-auto flex flex-col select-none">
-        <div className="w-full h-16 bg-sublime-dark-grey-blue box-border">
-          <ProblemHeader
-              URL={roomNumber ? `/problem/${version}/${id}/${roomNumber}` : `/problem/${version}/${id}`}
-              problemName={problem?.title ? problem.title : ''}
-              type={0}
-          />
-        </div>
-        <div className="flex-grow w-full flex flex-col bg-slate-200">
-          <div
-              className="flex flex-row w-full h-full p-4 overflow-x-hidden overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400">
-            {version === 'multi' && (
-                <div className="relative w-1/6 h-full">
-                  <div className="w-full mb-2">
-                    <PageButtons/>
-                  </div>
-                  <div className="w-full">
-                    <Video/>
-                  </div>
-                </div>
-            )}
-            <div className="relative h-full flex flex-col px-4" style={{width: `${leftWidth}%`}}>
-              <div className="flex w-full mb-2 space-x-2">
-                <EditorCanvasToggle
-                    isVisible={isEditorVisible}
-                    toggleVisibility={handleToggleEditor}
-                    label="코드에디터"
-                />
-                <EditorCanvasToggle
-                    isVisible={isCanvasVisible}
-                    toggleVisibility={handleToggleCanvas}
-                    label="화이트보드"
-                />
+    <div className="w-full h-screen mx-auto flex flex-col select-none">
+      <div className="w-full h-16 bg-sublime-dark-grey-blue box-border">
+        <ProblemHeader
+          URL={roomNumber ? `/problem/${version}/${id}/${roomNumber}` : `/problem/${version}/${id}`}
+          problemName={problem?.title ? problem.title : ''}
+          type={0}
+        />
+      </div>
+      <div className="flex-grow w-full flex flex-col bg-slate-200">
+        <div
+          className="flex flex-row w-full h-full p-4 overflow-x-hidden overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400">
+          {version === 'multi' && (
+            <div className="relative w-1/7 h-full">
+              <div className="w-full mb-2">
+                <PageButtons />
               </div>
-              <div style={styles.flipCard}>
-                <div
-                    style={{
-                      ...styles.flipCardInner,
-                      ...(isCanvasVisible ? styles.flipCardInnerFlipped : {}),
-                    }}
-                >
-                  <div style={styles.flipCardFrontBack} className="drop-shadow-lg rounded-lg">
-                    <div style={styles.editorContainer}>
-                      <div
-                        ref={editorRef}
-                        className="relative flex-grow select-text overflow-auto mt-2.5 rounded-lg"
-                        style={styles.editorTop}
-                      >
-                        {eView && (
-                          <LanguageSelector onClickModalElement={handleChangeEditorLanguage} />
-                        )}
-                      </div>
-                      <div style={styles.editorBottom}>
+              <div className="w-full">
+                <Video />
+              </div>
+            </div>
+          )}
+          <div className="relative h-full flex flex-col px-4" style={{ width: `${leftWidth}%` }}>
+            <div className="flex w-full mb-2 space-x-2">
+              <EditorCanvasToggle
+                isVisible={isEditorVisible}
+                toggleVisibility={handleToggleEditor}
+                label="코드에디터"
+              />
+              <EditorCanvasToggle
+                isVisible={isCanvasVisible}
+                toggleVisibility={handleToggleCanvas}
+                label="화이트보드"
+              />
+            </div>
+            <div style={styles.flipCard}>
+              <div
+                style={{
+                  ...styles.flipCardInner,
+                  ...(isCanvasVisible ? styles.flipCardInnerFlipped : {}),
+                }}
+              >
+                <div style={styles.flipCardFrontBack} className="drop-shadow-lg rounded-lg">
+                  <div style={styles.editorContainer}>
+                    <div
+                      ref={editorRef}
+                      className="relative flex-grow select-text overflow-auto mt-2.5 rounded-lg"
+                      style={styles.editorTop}
+                    >
+                      {eView && (
+                        <LanguageSelector onClickModalElement={handleChangeEditorLanguage} />
+                      )}
+                    </div>
+                    <div style={styles.editorBottom}>
+                      <div style={styles.inputButtonWrapper}>
                         <textarea
                           ref={inputRef}
-                          style={{ ...styles.textArea, flexBasis: '33.33%' }}
+                          style={styles.textArea}
                           placeholder="Input"
-                        />
-                        <textarea
-                          ref={resultRef}
-                          style={{ ...styles.textArea, flexBasis: '50%', backgroundColor: 'rgb(209 213 219)' }} // Tailwind's grey-300
-                          placeholder="Result"
-                          disabled
                         />
                         <button
                           style={styles.runButton}
@@ -568,38 +586,45 @@ const Problem = () => {
                           Run
                         </button>
                       </div>
+                      <textarea
+                        ref={resultRef}
+                        style={{ ...styles.textArea, flexBasis: '66.67%', backgroundColor: 'rgb(209 213 219)' }} // Tailwind's grey-300
+                        placeholder="Result"
+                        disabled
+                      />
                     </div>
                   </div>
-                  <div style={{...styles.flipCardFrontBack, ...styles.flipCardBack, padding: '0.5rem'}}>
-                    <Canvas roomNumber={roomNumber}/>
-                  </div>
+                </div>
+                <div style={{ ...styles.flipCardFrontBack, ...styles.flipCardBack, padding: '0.5rem' }}>
+                  <Canvas roomNumber={roomNumber} />
                 </div>
               </div>
             </div>
-            <div className="flex-grow h-full flex flex-col min-w-1/4" style={{width: `${100 - leftWidth}%`}}>
-              {problem && <ProblemContent problem={problem}/>}
-            </div>
+          </div>
+          <div className="flex-grow h-full flex flex-col min-w-1/4" style={{ width: `${100 - leftWidth}%` }}>
+            {problem && <ProblemContent problem={problem} />}
           </div>
         </div>
-
-        <div
-            className={`icon-container ${isResultVisible ? 'icon-partially-visible' : (isRecievedMessage ? 'icon-fully-visible' : 'icon-partially-visible')}`}
-            onClick={handleToggleChat}
-        >
-          {isResultVisible ? <Comment className="icon"/> : (isRecievedMessage ?
-              <NewMessage className="icon icon-orange"/> :
-              <Comment className="icon"/>)}
-        </div>
-
-        <div
-            className={`fixed bottom-4 right-4 bg-white border border-gray-200 rounded-lg p-4 shadow-lg overflow-y-auto ${
-                isResultVisible ? 'block' : 'hidden'
-            }`}
-            style={{width: '41.666667%', height: '70vh'}}
-        >
-          <ChattingSection roomNumber={roomNumber} onNewMessage={handleNewMessage}/>
-        </div>
       </div>
+  
+      <div
+        className={`icon-container fixed top-1 right-2 ${isResultVisible ? 'icon-partially-visible' : (isRecievedMessage ? 'icon-fully-visible' : 'icon-partially-visible')}`}
+        onClick={handleToggleChat}
+      >
+        {isResultVisible ? <NewMessage className="icon icon-white" /> : (isRecievedMessage ?
+          <NewMessage className="icon icon-orange" /> :
+          <NewMessage className="icon icon-white" />)}
+      </div>
+
+      <div
+        className={`fixed bottom-4 right-4 bg-white border border-gray-200 rounded-lg p-4 shadow-lg overflow-y-auto ${
+          isResultVisible ? 'block' : 'hidden'
+          }`}
+        style={{ width: '41.666667%', height: '70vh' }}
+      >
+        <ChattingSection roomNumber={roomNumber} onNewMessage={handleNewMessage} />
+      </div>
+    </div>
   );
 };
 

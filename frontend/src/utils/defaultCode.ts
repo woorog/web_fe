@@ -1,31 +1,26 @@
 const defaultCodes = {
+JavaScript: `
 
-
-  JavaScript: `
-  
-  // 테스트 1
+process.stdin.on('data', (data) => {
+  // const input = data.toString().trim();
+  const input = "oncore";
+  console.log(input);
+});    
 
 `,
   Python: `
-  
-  //테스트 2
-  
+
+# a = input()
+a = "oncore"
+print(a)
+
 `,
 
 
   '': `/*
 
 
-
-
-
-
-
-
-
-
-
-
+언어를 고르세요
 
 
 */`,

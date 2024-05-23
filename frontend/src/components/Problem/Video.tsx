@@ -253,10 +253,10 @@ export const Video = () => {
   };
 
   return (
-    <div className="mt-4 w-full min-h-36 flex flex-col justify-start items-center overflow-auto">
+    <div className="mt-4 w-full min-h-28 flex flex-col justify-start items-center overflow-auto">
       {Object.entries(peers).map((user, idx) => (
         <video
-          className="max-w-48 w-full max-h-36 h-auto mb-4 bg-white rounded-lg"
+          className="max-w-48 w-full max-h-28 h-auto mb-4 bg-white rounded-lg"
           autoPlay
           playsInline
           ref={(ele) => {
@@ -267,9 +267,9 @@ export const Video = () => {
           key={idx}
         />
       ))}
-      <div className="relative max-h-36 w-full h-auto flex flex-col items-center">
+      <div className="relative max-h-28 w-full h-auto flex flex-col items-center">
         <video
-          className="max-w-48 w-full max-h-36 h-auto mb-4 bg-white rounded-lg"
+          className="max-w-48 w-full max-h-28 h-auto mb-4 bg-white rounded-lg"
           ref={videoRef}
           autoPlay
           muted
@@ -284,7 +284,7 @@ export const Video = () => {
           </div>
         </div>
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-sm text-gray-600 text-center w-full">
-        {text}
+          {text}
         </div>
       </div>
     </div>

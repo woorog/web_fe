@@ -38,11 +38,11 @@
 ### backend/.env
 ```
 # development
-GRADING_SERVER_URL=http://localhost:4000/grade-server/v1/grading
+
 MYSQL_DATABASE=camperRank
 MYSQL_HOST=
 MYSQL_PASSWORD=
-MYSQL_PORT=3306
+MYSQL_PORT=
 MYSQL_USERNAME=
 SERVERLESS_GRADE_JAVASCRIPT=
 SERVERLESS_GRADE_PYTHON=
@@ -51,7 +51,7 @@ JWT_SECRETKEY=
 ### frontend/.env
 ```
 # development
-VITE_CLIENT_URL="http://127.0.0.1:5173/"
+VITE_CLIENT_URL="http://127.0.0.1:3232/"
 VITE_SERVER_URL="http://127.0.0.1:3000/api"
 VITE_SOCKET_SERVER_URL="ws://127.0.0.1:3333"
 VITE_SOCKET_URL="ws://127.0.0.1:4444/"

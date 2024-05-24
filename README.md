@@ -177,5 +177,6 @@ cd chat; yarn install; yarn start
 
 
 # 📃 프로젝트 포스터
-<a href="https://www.youtube.com/your-demo-link"> 이동하기 </a>
+![온코어_포스터-100](https://github.com/woorog/web_fe/assets/154962837/dcc37e1d-e543-43d1-b9fd-e29396bd120c)
+
 

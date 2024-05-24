@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://github.com/woorog/web_fe/assets/154962837/60b100d5-6855-4b96-a6eb-cc6ce32fee6b">
+  <img src="https://github.com/woorog/web_fe/assets/154962837/c14231bf-1d8d-4c68-beb2-022ff2e7cae0">
 
   <h2>동료들과 함께 알고리즘을 학습하고 소통할 수 있는 플랫폼</h2>
   <h4>🗝️ KeyWords <h4/>
@@ -97,7 +97,7 @@
 개발 환경 설정은 다음과 같습니다.
 
 # [.env]
-
+```
 <web_fe/backend>
 MYSQL_DATABASE=userdb
 MYSQL_HOST=localhost
@@ -107,7 +107,8 @@ MYSQL_USERNAME=hello
 SERVERLESS_GRADE_JAVASCRIPT=
 SERVERLESS_GRADE_PYTHON=
 JWT_SECRETKEY=secret
-
+```
+```
 <web_fe/frontend>
 VITE_CLIENT_URL="http://127.0.0.1:5173/"
 VITE_SERVER_URL="http://127.0.0.1:3000/api"
@@ -139,9 +140,10 @@ MONGO_PROD=mongodb://localhost:27017/admin
 
 ?# clova
 LLM_URL=yours
-
+```
 
 # [setting]
+```
 <터미널로 5개의 소켓을 열으신 후>
 
 cd backend; yarn install; yarn start:dev
@@ -153,18 +155,20 @@ cd frontend; yarn install; npx y-webrtc
 cd socket; yarn install; yarn dev
 
 cd chat; yarn install; yarn start
-
+```
 
 
 # 🔗 서버 아키텍처
 
-![image](https://github.com/woorog/web_fe/assets/154962837/d4d8f7a6-d63f-4a4e-b1d0-73abde0a3edc)
-
-
+![server](https://github.com/woorog/web_fe/assets/154962837/d4d8f7a6-d63f-4a4e-b1d0-73abde0a3edc)
 
 
 # 👻 팀 소개 (Krafton Jungle 4th)
 
-![image](https://github.com/woorog/web_fe/assets/154962837/43c73d69-d1fd-47cd-b548-852dc9797157)
+![Team](https://github.com/woorog/web_fe/assets/154962837/43c73d69-d1fd-47cd-b548-852dc9797157)
+
+# 📃 프로젝트 포스터
+
+![Poster](https://github.com/woorog/web_fe/assets/154962837/d44334fa-be21-4643-addf-3db99ae0bef0)
 
 

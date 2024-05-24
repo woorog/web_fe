@@ -13,13 +13,19 @@
     <img src="https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=MySQL&logoColor=white"/>
     <img src="https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=Redis&logoColor=white"/>
     <img src="https://img.shields.io/badge/WebRTC-333333?style=flat-square&logo=WebRTC&logoColor=white"/>
+    <br>
     <img src="https://img.shields.io/badge/Socket.io-010101?style=flat-square&logo=Socket.io&logoColor=white"/>
-    <img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=Docker&logoColor=white"/>
-    <img src="https://img.shields.io/badge/Nginx-009639?style=flat-square&logo=Nginx&logoColor=white"/>
+    <img src="https://img.shields.io/badge/TailwindCSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white"/>
+    <img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white"/>
+    <img src="https://img.shields.io/badge/Amazon%20EC2-FF9900?style=flat-square&logo=amazon-ec2&logoColor=white"/>
+    <img src="https://img.shields.io/badge/Express.js-000000?style=flat-square&logo=express&logoColor=white"/>
+    <img src="https://img.shields.io/badge/CodeMirror-FFFFFF?style=flat-square&logo=codemirror&logoColor=000000"/>
+    <img src="https://img.shields.io/badge/tldraw-333333?style=flat-square&logo=tldraw&logoColor=white"/>
+    
   </div>
   <br>
-  <a href="https://www.youtube.com/your-demo-link">🎥 데모영상</a>
-  <a href="https://youtu.be/your-presentation-link">🎤 발표영상</a>
+  <a href="https://www.youtube.com/your-demo-link">🎥 데모영상 보기 </a>
+  <a href="https://youtu.be/your-presentation-link">🎤 발표영상 보기 </a>
 </div>
 
 ---
@@ -108,6 +114,7 @@ SERVERLESS_GRADE_JAVASCRIPT=
 SERVERLESS_GRADE_PYTHON=
 JWT_SECRETKEY=secret
 ```
+
 ```
 <web_fe/frontend>
 VITE_CLIENT_URL="http://127.0.0.1:5173/"
@@ -118,7 +125,9 @@ VITE_SOCKET_URL="ws://127.0.0.1:4444/"
 
 VITE_CHAT_SOCKET_SERVER_URL="ws://127.0.0.1:8888/"
 VITE_SOCKET_CANVAS_URL="ws://127.0.0.1:5555/"
+```
 
+```
 <web_fe/chat>
 ?# common (? 빼세요)
 NODE_ENV=dev
@@ -156,7 +165,6 @@ cd socket; yarn install; yarn dev
 
 cd chat; yarn install; yarn start
 ```
-
 
 # 🔗 서버 아키텍처
 

@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { MessageData } from './ChatTypes';
-import clova from '../../../assets/clova.png';
+import clova from '../../../assets/clova-white.png';
 
 interface ChattingMessageProps {
   messageData: MessageData;

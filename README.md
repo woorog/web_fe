@@ -98,6 +98,13 @@
    - 여러 개의 소켓을 사용하기 때문에 부하 발생 시 Scaling 방법으로 Vertical Scaling 옵션만이 존재했으나, Redis Pub/Sub과 Load Balancer를 함께 사용하여 Horizontal Scaling 옵션도 가능하도록 서버 환경을 개선했습니다.
    - 기존 서비스에 영향을 크게 주지 않는 채팅 서버를 통해 부하를 줄이는 방법을 시도하였습니다.
 
+### 문제 인식
+기존의 웹 페이지 CSS와 새로 적용한 패키지의 CSS의 우선순위가 다르게 적용되면서 사용자에게 색상 표현이 안 나오는 문제가 발생했습니다.
+
+### 해결 방법
+ - 웹 개발 도구의 요소를 활용해 문제 지점을 찾아내고, 계층 구조를 파악해 동일한 문제가 발생하지 않도록 조치했습니다.
+ - 나아가 기존의 CSS를 tailwind를 활용한 방식으로 개선하여 개발자가 더 직관적으로 파악할 수 있게끔 했습니다.
+
 # 🔎 개발환경
 
 개발 환경 설정은 다음과 같습니다.
@@ -173,7 +180,7 @@ cd chat; yarn install; yarn start
 
 # 👻 팀 소개 (Krafton Jungle 4th)
 
-![Team](https://github.com/woorog/web_fe/assets/154962837/43c73d69-d1fd-47cd-b548-852dc9797157)
+![team](https://github.com/woorog/web_fe/assets/154962837/bcf25a37-0a10-4164-8ee3-6e33a63e0e9a)
 
 
 # 📃 프로젝트 포스터
